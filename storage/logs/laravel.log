@@ -7154,3 +7154,67 @@
 #50 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(16): require_once('D:\\\\Work\\\\web\\\\Mus...')
 #51 {main}
 "} 
+[2025-12-01 17:08:28] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php:212)
+[stacktrace]
+#0 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php(137): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php(124): Illuminate\\Log\\LogManager->get(NULL)
+#2 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php(681): Illuminate\\Log\\LogManager->driver()
+#3 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Exceptions\\Handler.php(317): Illuminate\\Log\\LogManager->error('PHP Parse error...', Array)
+#4 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Exceptions\\Handler.php(278): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Psy\\Exception\\ParseErrorException))
+#5 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\nunomaduro\\collision\\src\\Adapters\\Laravel\\ExceptionHandler.php(46): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Psy\\Exception\\ParseErrorException))
+#6 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(523): NunoMaduro\\Collision\\Adapters\\Laravel\\ExceptionHandler->report(Object(Psy\\Exception\\ParseErrorException))
+#7 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(203): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Psy\\Exception\\ParseErrorException))
+#8 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#9 {main}
+"} 
+[2025-12-01 17:08:28] laravel.ERROR: PHP Parse error: Syntax error, unexpected T_NS_SEPARATOR, expecting T_VARIABLE on line 1 {"exception":"[object] (Psy\\Exception\\ParseErrorException(code: 0): PHP Parse error: Syntax error, unexpected T_NS_SEPARATOR, expecting T_VARIABLE on line 1 at D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\psy\\psysh\\src\\Exception\\ParseErrorException.php:44)
+[stacktrace]
+#0 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\psy\\psysh\\src\\CodeCleaner.php(488): Psy\\Exception\\ParseErrorException::fromParseError(Object(PhpParser\\Error))
+#1 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\psy\\psysh\\src\\CodeCleaner.php(269): Psy\\CodeCleaner->parse('<?php echo 'Tot...', false)
+#2 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\psy\\psysh\\src\\Shell.php(933): Psy\\CodeCleaner->clean(Array, false)
+#3 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\psy\\psysh\\src\\Shell.php(966): Psy\\Shell->addCode('echo 'Total Sur...', true)
+#4 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\psy\\psysh\\src\\Shell.php(1510): Psy\\Shell->setCode('echo 'Total Sur...', true)
+#5 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\tinker\\src\\Console\\TinkerCommand.php(76): Psy\\Shell->execute('echo 'Total Sur...')
+#6 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Laravel\\Tinker\\Console\\TinkerCommand->handle()
+#7 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#8 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#9 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#10 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#11 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(211): Illuminate\\Container\\Container->call(Array)
+#12 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Command\\Command.php(326): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#13 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#14 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Application.php(1088): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#15 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Application.php(324): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#16 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Application.php(175): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#17 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(201): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#19 {main}
+"} 
+[2025-12-01 17:08:34] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php:212)
+[stacktrace]
+#0 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php(137): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php(124): Illuminate\\Log\\LogManager->get(NULL)
+#2 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php(681): Illuminate\\Log\\LogManager->driver()
+#3 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Exceptions\\Handler.php(317): Illuminate\\Log\\LogManager->error('The \"--table\" o...', Array)
+#4 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Exceptions\\Handler.php(278): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Symfony\\Component\\Console\\Exception\\RuntimeException))
+#5 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\nunomaduro\\collision\\src\\Adapters\\Laravel\\ExceptionHandler.php(46): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Symfony\\Component\\Console\\Exception\\RuntimeException))
+#6 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(523): NunoMaduro\\Collision\\Adapters\\Laravel\\ExceptionHandler->report(Object(Symfony\\Component\\Console\\Exception\\RuntimeException))
+#7 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(203): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Symfony\\Component\\Console\\Exception\\RuntimeException))
+#8 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#9 {main}
+"} 
+[2025-12-01 17:08:34] laravel.ERROR: The "--table" option does not exist. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\RuntimeException(code: 0): The \"--table\" option does not exist. at D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Input\\ArgvInput.php:223)
+[stacktrace]
+#0 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Input\\ArgvInput.php(150): Symfony\\Component\\Console\\Input\\ArgvInput->addLongOption('table', 'surahs')
+#1 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Input\\ArgvInput.php(85): Symfony\\Component\\Console\\Input\\ArgvInput->parseLongOption('--table=surahs')
+#2 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Input\\ArgvInput.php(74): Symfony\\Component\\Console\\Input\\ArgvInput->parseToken('--table=surahs', true)
+#3 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Input\\Input.php(56): Symfony\\Component\\Console\\Input\\ArgvInput->parse()
+#4 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Command\\Command.php(285): Symfony\\Component\\Console\\Input\\Input->bind(Object(Symfony\\Component\\Console\\Input\\InputDefinition))
+#5 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#6 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Application.php(1088): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#7 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Application.php(324): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\ShowCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\symfony\\console\\Application.php(175): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#9 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(201): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 D:\\Work\\web\\Muslim Buddy\\muslim-buddy-laravel\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#11 {main}
+"} 
