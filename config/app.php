@@ -42,7 +42,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Dhaka'),
 
     /*
     |--------------------------------------------------------------------------
@@ -144,7 +144,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'aliases' => Facade::defaultAliases()->merge([
+    'aliases' => \Illuminate\Support\Facades\Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example::class,
     ])->toArray(),
 

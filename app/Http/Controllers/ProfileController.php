@@ -78,14 +78,37 @@ class ProfileController extends Controller
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'location_name' => 'nullable|string|max:255',
-            'calculation_method' => 'nullable|string',
-            'madhab' => 'nullable|in:Shafi,Hanafi',
-            'timezone' => 'nullable|string',
         ]);
 
         $user->update($validated);
 
         return redirect()->route('profile.show')->with('success', 'Profile updated successfully!');
+    }
+
+    /**
+     * Update Islamic preferences
+     */
+    public function updateIslamicPreferences(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'calculation_method' => 'nullable|in:MuslimWorldLeague,Egyptian,Karachi,UmmAlQura,Dubai,MoonsightingCommittee,NorthAmerica,Kuwait,Qatar,Singapore,Tehran,Turkey',
+            'madhab' => 'nullable|in:Shafi,Hanafi',
+            'timezone' => 'nullable|string|max:50',
+            'prayer_notifications' => 'boolean',
+            'reminder_minutes' => 'nullable|integer|min:0|max:60',
+            'quran_translation' => 'nullable|in:english,arabic,both',
+            'arabic_text_size' => 'nullable|in:small,medium,large',
+            'daily_verse_goal' => 'nullable|integer|min:1|max:100',
+            'enable_night_mode' => 'boolean',
+            'auto_mark_prayers' => 'boolean',
+            'congregation_points_bonus' => 'boolean',
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('profile.edit')->with('success', 'Islamic preferences updated successfully!');
     }
 
     /**

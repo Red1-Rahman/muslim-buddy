@@ -1,0 +1,101 @@
+# Laravel Framework
+/bootstrap/compiled.php
+/bootstrap/cache
+/app/storage/
+/vendor/
+/storage/*.key
+/storage/app/public
+/storage/debugbar
+/storage/logs
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/testing
+/storage/framework/views
+
+# Node modules
+/node_modules/
+/npm-debug.log
+yarn-error.log
+
+# Environment files
+.env
+.env.backup
+.env.production
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Composer
+composer.phar
+/vendor/
+
+# Laravel specific
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+
+# Build files
+/public/hot
+/public/storage
+/public/build
+/public/mix-manifest.json
+
+# Logs
+*.log
+laravel.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# Lock files
+package-lock.json
+yarn.lock
+composer.lock
+
+# Cache files
+.sass-cache/
+*.css.map
+
+# Documentation
+/docs/build/
+
+# Test files
+/tests/Browser/screenshots/
+/tests/Browser/console/
+
+# Custom files for this project
+/resources/views/hadiths/*/
+!/resources/views/hadiths/**/*.blade.php
+/public/storage/hadith_data/

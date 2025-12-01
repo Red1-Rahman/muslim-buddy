@@ -53,48 +53,67 @@ class PrayerTimes
         $month = (int)$this->date->format('m');
         $day = (int)$this->date->format('d');
 
-        // Calculate Dhuhr (solar noon)
+        // Calculate Dhuhr (solar noon) - no timezone offset needed as we handle it in DateTime creation
         $this->dhuhr = $this->timeComponentsToDateTime($solarTime->transit, $year, $month, $day);
-        $this->dhuhr->add(new DateInterval('PT' . (int)$this->calculationParameters->methodAdjustments['dhuhr'] . 'M'));
+        $this->applyMethodAdjustment($this->dhuhr, 'dhuhr');
 
         // Calculate Sunrise
         $this->sunrise = $this->timeComponentsToDateTime($solarTime->sunrise, $year, $month, $day);
-        $this->sunrise->add(new DateInterval('PT' . (int)$this->calculationParameters->methodAdjustments['sunrise'] . 'M'));
+        $this->applyMethodAdjustment($this->sunrise, 'sunrise');
 
-        // Calculate Sunset
+        // Calculate Sunset  
         $this->sunset = $this->timeComponentsToDateTime($solarTime->sunset, $year, $month, $day);
+        $this->applyMethodAdjustment($this->sunset, 'sunset');
 
-        // Calculate Asr
+        // Calculate Asr using proper shadow calculation
         $asrTime = $solarTime->afternoon($this->calculationParameters->shadowLength());
         $this->asr = $this->timeComponentsToDateTime($asrTime, $year, $month, $day);
-        $this->asr->add(new DateInterval('PT' . (int)$this->calculationParameters->methodAdjustments['asr'] . 'M'));
+        $this->applyMethodAdjustment($this->asr, 'asr');
 
-        // Calculate tomorrow's solar time for Isha
-        $tomorrow = (clone $this->date)->add(new DateInterval('P1D'));
-        $tomorrowSolarTime = new SolarTime($tomorrow, $this->coordinates);
-
-        // Calculate Fajr
-        $nightFraction = $this->calculationParameters->fajrAngle;
-        $fajrTime = $solarTime->hourAngle(-1 * $nightFraction, false);
+        // Calculate Fajr using depression angle - this should be in early morning
+        $fajrTime = $solarTime->hourAngle(-1 * $this->calculationParameters->fajrAngle, false);
         $this->fajr = $this->timeComponentsToDateTime($fajrTime, $year, $month, $day);
-        $this->fajr->add(new DateInterval('PT' . (int)$this->calculationParameters->methodAdjustments['fajr'] . 'M'));
+        
+        // If Fajr time is after noon (incorrect calculation), move to previous day
+        if ($this->fajr->format('H') > 12) {
+            $this->fajr->sub(new DateInterval('P1D'));
+        }
+        $this->applyMethodAdjustment($this->fajr, 'fajr');
 
-        // Calculate Maghrib
+        // Calculate Maghrib (usually same as sunset with small adjustment)
         $this->maghrib = clone $this->sunset;
-        $this->maghrib->add(new DateInterval('PT' . (int)$this->calculationParameters->methodAdjustments['maghrib'] . 'M'));
+        $this->applyMethodAdjustment($this->maghrib, 'maghrib');
 
         // Calculate Isha
         if ($this->calculationParameters->ishaInterval > 0) {
+            // Fixed interval method (e.g., Umm Al-Qura)
             $this->isha = clone $this->maghrib;
             $this->isha->add(new DateInterval('PT' . (int)($this->calculationParameters->ishaInterval * 60) . 'M'));
         } else {
+            // Depression angle method
             $ishaTime = $solarTime->hourAngle(-1 * $this->calculationParameters->ishaAngle, true);
             $this->isha = $this->timeComponentsToDateTime($ishaTime, $year, $month, $day);
         }
-        $this->isha->add(new DateInterval('PT' . (int)$this->calculationParameters->methodAdjustments['isha'] . 'M'));
+        $this->applyMethodAdjustment($this->isha, 'isha');
 
         // Calculate forbidden prayer times
         $this->calculateForbiddenTimes();
+    }
+    
+    /**
+     * Apply method-specific time adjustments
+     */
+    private function applyMethodAdjustment(DateTime $time, string $prayer): void
+    {
+        $adjustment = $this->calculationParameters->methodAdjustments[$prayer] ?? 0;
+        if ($adjustment != 0) {
+            $interval = $adjustment > 0 ? 'PT' . $adjustment . 'M' : 'PT' . abs($adjustment) . 'M';
+            if ($adjustment > 0) {
+                $time->add(new DateInterval($interval));
+            } else {
+                $time->sub(new DateInterval($interval));
+            }
+        }
     }
 
     /**
@@ -118,17 +137,52 @@ class PrayerTimes
     }
 
     /**
-     * Convert time components (hours) to DateTime
+     * Convert time components (hours) to DateTime with proper timezone handling
      */
     private function timeComponentsToDateTime(float $hours, int $year, int $month, int $day): DateTime
     {
-        $minutes = $hours * 60;
-        $hour = floor($minutes / 60);
-        $minute = round($minutes - ($hour * 60));
+        // The astronomical calculations return time in universal time
+        // We need to convert this to local solar time for the longitude
         
-        $dateTime = new DateTime();
+        // Calculate the longitude time offset
+        $longitudeOffset = $this->coordinates->longitude / 15.0; // 15 degrees per hour
+        
+        // Apply longitude offset to get local solar time
+        $localHours = $hours + $longitudeOffset;
+        
+        // Handle day boundaries
+        $dayOffset = 0;
+        if ($localHours < 0) {
+            $dayOffset = -1;
+            $localHours += 24;
+        } elseif ($localHours >= 24) {
+            $dayOffset = floor($localHours / 24);
+            $localHours = fmod($localHours, 24);
+        }
+        
+        // Extract hour and minute components
+        $totalMinutes = $localHours * 60;
+        $hour = floor($totalMinutes / 60);
+        $minute = round($totalMinutes - ($hour * 60));
+        
+        // Ensure valid hour and minute ranges
+        $hour = max(0, min(23, (int)$hour));
+        $minute = max(0, min(59, (int)$minute));
+        
+        // Create DateTime with the same timezone as the input date
+        $dateTime = new DateTime('now', $this->date->getTimezone());
         $dateTime->setDate($year, $month, $day);
-        $dateTime->setTime((int)$hour, (int)$minute, 0);
+        $dateTime->setTime($hour, $minute, 0);
+        
+        // Apply day offset if needed
+        if ($dayOffset != 0) {
+            $interval = $dayOffset > 0 ? 'P' . $dayOffset . 'D' : 'P' . abs($dayOffset) . 'D';
+            if ($dayOffset > 0) {
+                $dateTime->add(new DateInterval($interval));
+            } else {
+                $dateTime->sub(new DateInterval($interval));
+            }
+        }
         
         return $dateTime;
     }

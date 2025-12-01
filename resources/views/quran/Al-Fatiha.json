@@ -1,0 +1,46 @@
+{
+  "surah": {
+    "number": 1,
+    "name": "Al-Fātiḥah",
+    "arabic_name": "الفاتحة",
+    "english_name": "The Opening",
+    "number_of_ayah": 7,
+    "ayahs": [
+      {
+        "number": 1,
+        "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+        "english": "In the name of Allah, the Most Gracious, the Most Merciful."
+      },
+      {
+        "number": 2,
+        "arabic": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+        "english": "All praise is due to Allah, Lord of the worlds."
+      },
+      {
+        "number": 3,
+        "arabic": "الرَّحْمَٰنِ الرَّحِيمِ",
+        "english": "The Most Gracious, the Most Merciful."
+      },
+      {
+        "number": 4,
+        "arabic": "مَالِكِ يَوْمِ الدِّينِ",
+        "english": "Master of the Day of Judgment."
+      },
+      {
+        "number": 5,
+        "arabic": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+        "english": "You alone we worship, and You alone we ask for help."
+      },
+      {
+        "number": 6,
+        "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+        "english": "Guide us to the straight path,"
+      },
+      {
+        "number": 7,
+        "arabic": "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+        "english": "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray."
+      }
+    ]
+  }
+}

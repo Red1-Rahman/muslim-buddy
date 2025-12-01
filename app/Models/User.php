@@ -31,6 +31,14 @@ class User extends Authenticatable
         'total_points',
         'prayer_streak',
         'last_prayer_date',
+        'prayer_notifications',
+        'reminder_minutes',
+        'quran_translation',
+        'arabic_text_size',
+        'daily_verse_goal',
+        'enable_night_mode',
+        'auto_mark_prayers',
+        'congregation_points_bonus',
     ];
 
     /**
@@ -54,6 +62,12 @@ class User extends Authenticatable
         'last_prayer_date' => 'date',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'prayer_notifications' => 'boolean',
+        'enable_night_mode' => 'boolean',
+        'auto_mark_prayers' => 'boolean',
+        'congregation_points_bonus' => 'boolean',
+        'reminder_minutes' => 'integer',
+        'daily_verse_goal' => 'integer',
     ];
 
     /**

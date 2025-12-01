@@ -117,4 +117,23 @@ class CalculationMethod
         $params->methodAdjustments['maghrib'] = 7;
         return $params;
     }
+
+    /**
+     * Moonsighting Committee
+     */
+    public static function moonsightingCommittee(): CalculationParameters
+    {
+        $params = new CalculationParameters('MoonsightingCommittee', 18, 18);
+        $params->methodAdjustments['dhuhr'] = 5;
+        $params->methodAdjustments['maghrib'] = 3;
+        return $params;
+    }
+
+    /**
+     * Other method for custom calculations
+     */
+    public static function other(): CalculationParameters
+    {
+        return new CalculationParameters('Other', 0, 0);
+    }
 }

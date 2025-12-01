@@ -8,7 +8,7 @@
         <h1 class="text-3xl font-bold text-gray-900">
             <i class="fas fa-prayer-hands text-indigo-600"></i> Prayer Times
         </h1>
-        <p class="text-gray-600 mt-1">{{ $date->format('l, F j, Y') }}</p>
+        <p class="text-gray-600 mt-1 prayer-date">{{ $date->format('l, F j, Y') }}</p>
         @if($user->location_name)
         <p class="text-gray-500 text-sm mt-1">
             <i class="fas fa-map-marker-alt"></i> {{ $user->location_name }}
@@ -19,8 +19,16 @@
     <!-- Prayer Times Display -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
         <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
-            <h2 class="text-2xl font-semibold">Today's Prayer Schedule</h2>
-            <p class="text-indigo-100 mt-1">Method: {{ $user->calculation_method ?? 'Muslim World League' }} | Madhab: {{ $user->madhab ?? 'Shafi' }}</p>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-semibold">Today's Prayer Schedule</h2>
+                    <p class="text-indigo-100 mt-1">Method: {{ $user->calculation_method ?? 'Muslim World League' }} | Madhab: {{ $user->madhab ?? 'Shafi' }}</p>
+                </div>
+                <a href="{{ route('prayers.test') }}" 
+                   class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    <i class="fas fa-flask mr-2"></i>Test Accuracy
+                </a>
+            </div>
         </div>
 
         <div class="p-6">
@@ -128,12 +136,44 @@
 
 @push('scripts')
 <script>
+// Auto-detect and send timezone with requests
+document.addEventListener('DOMContentLoaded', function() {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    // Set timezone header for all AJAX requests
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options = {}) {
+        options.headers = {
+            ...options.headers,
+            'X-User-Timezone': userTimezone
+        };
+        return originalFetch(url, options);
+    };
+    
+    // Update current page with correct timezone if needed
+    const currentDate = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric', 
+        month: 'long',
+        day: 'numeric',
+        timeZone: userTimezone
+    });
+    
+    const dateElement = document.querySelector('.prayer-date');
+    if (dateElement) {
+        dateElement.textContent = currentDate;
+    }
+});
+
 function togglePrayer(prayerLogId) {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
     fetch(`/prayers/${prayerLogId}/toggle`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-User-Timezone': userTimezone
         }
     })
     .then(response => response.json())

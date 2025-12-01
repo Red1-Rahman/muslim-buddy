@@ -48,6 +48,6 @@ class SolarCoordinates
         // Apparent sidereal time
         // Equation from Astronomical Algorithms page 88
         $this->apparentSiderealTime = $Theta0 + 
-            ($dPsi * 3600 * cos(MathUtils::degreesToRadians($Epsilon0 + $dEpsilon))) / 3600;
+            ($dPsi * cos(MathUtils::degreesToRadians($Epsilon0 + $dEpsilon))) / 15.0;
     }
 }

@@ -29,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name('show');
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
         Route::put('/update', [ProfileController::class, 'update'])->name('update');
+        Route::put('/islamic-preferences', [ProfileController::class, 'updateIslamicPreferences'])->name('islamic-preferences');
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
         Route::post('/location', [ProfileController::class, 'updateLocation'])->name('location');
         Route::post('/daily-goal', [ProfileController::class, 'setDailyGoal'])->name('daily-goal');
@@ -37,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
     // Prayer routes
     Route::prefix('prayers')->name('prayers.')->group(function () {
         Route::get('/', [PrayerController::class, 'index'])->name('index');
+        Route::get('/test', [PrayerController::class, 'test'])->name('test');
         Route::post('/{id}/complete', [PrayerController::class, 'complete'])->name('complete');
         Route::post('/{id}/toggle', [PrayerController::class, 'toggle'])->name('toggle');
         Route::get('/statistics', [PrayerController::class, 'statistics'])->name('statistics');
@@ -60,6 +62,22 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('leaderboard')->name('leaderboard.')->group(function () {
         Route::get('/', [LeaderboardController::class, 'index'])->name('index');
         Route::get('/user/{userId}', [LeaderboardController::class, 'userStats'])->name('user-stats');
+    });
+});
+
+// Hadith routes (some public, some require auth)
+use App\Http\Controllers\HadithController;
+
+Route::prefix('hadith')->name('hadith.')->group(function () {
+    // Public hadith browsing
+    Route::get('/', [HadithController::class, 'index'])->name('index');
+    Route::get('/{hadith}', [HadithController::class, 'show'])->name('show');
+    Route::get('/search/ajax', [HadithController::class, 'search'])->name('search');
+    
+    // Authenticated hadith features
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/dashboard/progress', [HadithController::class, 'dashboard'])->name('dashboard');
+        Route::post('/{hadith}/progress', [HadithController::class, 'updateProgress'])->name('update-progress');
     });
 });
 

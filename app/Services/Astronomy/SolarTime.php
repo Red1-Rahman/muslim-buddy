@@ -40,7 +40,8 @@ class SolarTime
             $this->solar->rightAscension
         );
 
-        $solarAltitude = -50.0 / 60.0;
+        // Use geometric altitude for sunrise/sunset (-0.833°)
+        $solarAltitude = -0.8333;
 
         $this->approxTransit = $m0;
 

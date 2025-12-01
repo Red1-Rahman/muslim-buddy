@@ -34,8 +34,9 @@ class PrayerController extends Controller
         $calculationParams = CalculationMethod::$method();
         $calculationParams->madhab = $user->madhab ?? 'Shafi';
 
-        // Calculate prayer times for today
-        $date = new DateTime($request->input('date', 'now'));
+        // Calculate prayer times for today with proper timezone
+        $userTimezone = $user->timezone ?? $this->detectUserTimezone($request) ?? 'UTC';
+        $date = new DateTime($request->input('date', 'now'), new \DateTimeZone($userTimezone));
         $prayerTimes = new PrayerTimes($coordinates, $date, $calculationParams);
 
         // Get today's prayer logs
@@ -58,6 +59,97 @@ class PrayerController extends Controller
         }
 
         return view('prayers.index', compact('prayerTimes', 'prayerLogs', 'user', 'date'));
+    }
+
+    /**
+     * Test prayer times accuracy for different cities
+     */
+    public function test(Request $request)
+    {
+        $testCities = [
+            [
+                'name' => 'Dhaka, Bangladesh',
+                'coordinates' => '23.8103°N, 90.4125°E',
+                'lat' => 23.8103,
+                'lon' => 90.4125,
+                'timezone' => 'Asia/Dhaka',
+                'method' => 'Karachi'
+            ],
+            [
+                'name' => 'Mecca, Saudi Arabia',
+                'coordinates' => '21.4225°N, 39.8262°E',
+                'lat' => 21.4225,
+                'lon' => 39.8262,
+                'timezone' => 'Asia/Riyadh',
+                'method' => 'UmmAlQura'
+            ],
+            [
+                'name' => 'London, UK',
+                'coordinates' => '51.5074°N, 0.1278°W',
+                'lat' => 51.5074,
+                'lon' => -0.1278,
+                'timezone' => 'Europe/London',
+                'method' => 'MuslimWorldLeague'
+            ],
+            [
+                'name' => 'New York, USA',
+                'coordinates' => '40.7128°N, 74.0060°W',
+                'lat' => 40.7128,
+                'lon' => -74.0060,
+                'timezone' => 'America/New_York',
+                'method' => 'NorthAmerica'
+            ],
+            [
+                'name' => 'Cairo, Egypt',
+                'coordinates' => '30.0444°N, 31.2357°E',
+                'lat' => 30.0444,
+                'lon' => 31.2357,
+                'timezone' => 'Africa/Cairo',
+                'method' => 'Egyptian'
+            ],
+            [
+                'name' => 'Istanbul, Turkey',
+                'coordinates' => '41.0082°N, 28.9784°E',
+                'lat' => 41.0082,
+                'lon' => 28.9784,
+                'timezone' => 'Europe/Istanbul',
+                'method' => 'Turkey'
+            ]
+        ];
+
+        $testResults = [];
+        $today = new DateTime('now');
+
+        foreach ($testCities as $city) {
+            try {
+                $coordinates = new Coordinates($city['lat'], $city['lon']);
+                $date = new DateTime('now', new \DateTimeZone($city['timezone']));
+                
+                $methodName = lcfirst($city['method']);
+                $calculationParams = CalculationMethod::$methodName();
+                
+                $prayerTimes = new PrayerTimes($coordinates, $date, $calculationParams);
+                
+                $city['times'] = [
+                    'fajr' => $prayerTimes->fajr->format('H:i'),
+                    'sunrise' => $prayerTimes->sunrise->format('H:i'),
+                    'dhuhr' => $prayerTimes->dhuhr->format('H:i'),
+                    'asr' => $prayerTimes->asr->format('H:i'),
+                    'maghrib' => $prayerTimes->maghrib->format('H:i'),
+                    'isha' => $prayerTimes->isha->format('H:i'),
+                ];
+                
+                $city['current_prayer'] = $prayerTimes->currentPrayer($date);
+                $city['is_forbidden_time'] = $prayerTimes->isForbiddenTime($date);
+                
+                $testResults[] = $city;
+            } catch (\Exception $e) {
+                $city['error'] = $e->getMessage();
+                $testResults[] = $city;
+            }
+        }
+
+        return view('prayers.test', compact('testResults'));
     }
 
     /**
@@ -187,5 +279,49 @@ class PrayerController extends Controller
             ->pluck('count', 'month');
 
         return view('prayers.statistics', compact('stats', 'monthlyData', 'user'));
+    }
+
+    /**
+     * Detect user's timezone from request headers or JavaScript
+     */
+    private function detectUserTimezone(Request $request): ?string
+    {
+        // Try to get timezone from request header (if set by JavaScript)
+        $timezone = $request->header('X-User-Timezone');
+        
+        if ($timezone && $this->isValidTimezone($timezone)) {
+            return $timezone;
+        }
+
+        // Try to detect from Accept-Language header and approximate
+        $acceptLanguage = $request->header('Accept-Language', '');
+        $languageMap = [
+            'en-US' => 'America/New_York',
+            'en-GB' => 'Europe/London',
+            'en-CA' => 'America/Toronto',
+            'en-AU' => 'Australia/Sydney',
+            'ar-SA' => 'Asia/Riyadh',
+            'tr-TR' => 'Europe/Istanbul',
+            'ur-PK' => 'Asia/Karachi',
+            'ms-MY' => 'Asia/Kuala_Lumpur',
+            'id-ID' => 'Asia/Jakarta',
+            'bn-BD' => 'Asia/Dhaka',
+        ];
+
+        foreach ($languageMap as $lang => $tz) {
+            if (strpos($acceptLanguage, $lang) !== false) {
+                return $tz;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Validate if timezone is valid
+     */
+    private function isValidTimezone(string $timezone): bool
+    {
+        return in_array($timezone, timezone_identifiers_list());
     }
 }

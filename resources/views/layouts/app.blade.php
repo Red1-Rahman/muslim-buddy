@@ -55,6 +55,9 @@
                         <a href="{{ route('quran.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             <i class="fas fa-book-quran mr-1"></i> Quran
                         </a>
+                        <a href="{{ route('hadith.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            <i class="fas fa-scroll mr-1"></i> Hadiths
+                        </a>
                         <a href="{{ route('leaderboard.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             <i class="fas fa-trophy mr-1"></i> Leaderboard
                         </a>
