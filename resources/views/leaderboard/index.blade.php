@@ -141,7 +141,7 @@
 
     <!-- Motivation Section -->
     <div class="mt-8 bg-gradient-to-r from-green-400 to-teal-500 rounded-lg shadow-lg p-6 text-white">
-        <h3 class="text-xl font-bold mb-2">Keep Growing! 🌱</h3>
+        <h3 class="text-xl font-bold mb-2">Keep Growing!</h3>
         <p class="text-sm opacity-90">
             @if($userRank && $userRank > 10)
                 You're doing great! Keep practicing to climb higher in the rankings.

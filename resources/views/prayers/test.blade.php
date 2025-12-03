@@ -59,33 +59,6 @@
                 @endforeach
             </div>
 
-            <!-- Calculation Details -->
-            <div class="mt-12 bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Calculation Notes</h2>
-                <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
-                    <div>
-                        <h3 class="font-semibold mb-2">Improvements Made:</h3>
-                        <ul class="space-y-1 list-disc list-inside">
-                            <li>Proper timezone offset calculations</li>
-                            <li>Accurate solar coordinate computations</li>
-                            <li>Correct apparent sidereal time formula</li>
-                            <li>Standard geometric altitude for sunrise/sunset (-0.833°)</li>
-                            <li>Proper method-specific adjustments</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold mb-2">Based on TypeScript Implementation:</h3>
-                        <ul class="space-y-1 list-disc list-inside">
-                            <li>SolarCoordinates class improvements</li>
-                            <li>Astronomical calculation precision</li>
-                            <li>CalculationMethod parameters</li>
-                            <li>Time component handling</li>
-                            <li>Nutation and obliquity corrections</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
             <!-- Back Button -->
             <div class="text-center mt-8">
                 <a href="{{ route('prayers.index') }}" 

@@ -15,9 +15,10 @@ class HadithController extends Controller
 {
     public function index(Request $request): View
     {
-        $collections = HadithCollection::with(['chapters' => function ($query) {
-            $query->orderBy('chapter_number');
-        }])->get();
+        $collections = HadithCollection::withCount(['chapters', 'hadiths'])
+            ->with(['chapters' => function ($query) {
+                $query->orderBy('chapter_number');
+            }])->get();
 
         $selectedCollection = null;
         $chapters = collect();

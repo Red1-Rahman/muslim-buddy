@@ -92,12 +92,12 @@ class PrayerController extends Controller
                 'method' => 'MuslimWorldLeague'
             ],
             [
-                'name' => 'New York, USA',
-                'coordinates' => '40.7128°N, 74.0060°W',
-                'lat' => 40.7128,
-                'lon' => -74.0060,
-                'timezone' => 'America/New_York',
-                'method' => 'NorthAmerica'
+                'name' => 'Gaza, Palestine',
+                'coordinates' => '31.5017°N, 34.4668°E',
+                'lat' => 31.5017,
+                'lon' => 34.4668,
+                'timezone' => 'Asia/Gaza',
+                'method' => 'Egyptian'
             ],
             [
                 'name' => 'Cairo, Egypt',
@@ -262,11 +262,17 @@ class PrayerController extends Controller
                 ->where('is_completed', true)
                 ->where('in_congregation', true)
                 ->count(),
-            'current_streak' => $user->prayer_streak,
+            'current_streak' => $user->prayer_streak ?? 0,
             'this_month' => PrayerLog::where('user_id', $user->id)
                 ->where('is_completed', true)
                 ->whereMonth('prayer_date', now()->month)
                 ->count(),
+            'recent_prayers' => PrayerLog::where('user_id', $user->id)
+                ->where('is_completed', true)
+                ->orderBy('prayer_date', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get(),
         ];
 
         // Get monthly prayer completion rate
