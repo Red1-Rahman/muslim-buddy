@@ -99,14 +99,30 @@ class UserVerseProgress extends Model
     /**
      * Schedule next review using spaced repetition
      */
-    public function scheduleNextReview(): void
+    public function scheduleNextReview($difficulty = 'easy'): void
     {
         $intervals = [1, 3, 7, 14, 30, 60]; // Days
         $reviewCount = min($this->review_count, count($intervals) - 1);
-        $nextInterval = $intervals[$reviewCount];
+        
+        // Adjust interval based on difficulty
+        switch ($difficulty) {
+            case 'hard':
+                // Reset to 1 day if hard
+                $nextInterval = 1;
+                break;
+            case 'medium':
+                // Use half the normal interval (minimum 1 day)
+                $nextInterval = max(1, intval($intervals[$reviewCount] / 2));
+                break;
+            case 'easy':
+            default:
+                // Use normal interval
+                $nextInterval = $intervals[$reviewCount];
+                break;
+        }
 
         $this->update([
-            'review_count' => $this->review_count + 1,
+            'review_count' => $difficulty === 'hard' ? $this->review_count : $this->review_count + 1,
             'last_reviewed_at' => now(),
             'next_review_at' => now()->addDays($nextInterval),
         ]);

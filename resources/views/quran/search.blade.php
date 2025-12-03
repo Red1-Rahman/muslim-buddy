@@ -1,25 +1,38 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Search Quran') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+@section('title', 'Search Quran')
+
+@section('content')
+<div class="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-emerald-900 mb-2">🔍 Search Quran</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Search through verses in Arabic text, English translation, and transliteration
+            </p>
+        </div>
+
+        <!-- Back to Quran -->
+        <div class="mb-6">
+            <a href="{{ route('quran.index') }}" 
+               class="text-emerald-600 hover:text-emerald-800 flex items-center">
+                ← Back to Quran
+            </a>
+        </div>
             <!-- Search Form -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6 bg-white border-b border-gray-200">
+            <div class="bg-white rounded-xl shadow-lg mb-6">
+                <div class="p-6">
                     <form method="GET" action="{{ route('quran.search') }}" class="mb-4">
                         <div class="flex gap-4">
                             <input type="text" 
-                                   name="query" 
+                                   name="q" 
                                    value="{{ $query }}" 
-                                   placeholder="Search verses..." 
-                                   class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                   placeholder="Search verses in Arabic, English, or transliteration..." 
+                                   class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
                             <button type="submit" 
-                                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
-                                Search
+                                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+                                🔍 Search
                             </button>
                         </div>
                     </form>
@@ -28,9 +41,9 @@
 
             <!-- Search Results -->
             @if($query)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <h3 class="text-lg font-semibold mb-4">
+                <div class="bg-white rounded-xl shadow-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">
                             Search Results for "{{ $query }}" ({{ $verses->count() }} found)
                         </h3>
 
@@ -45,7 +58,7 @@
                                             </div>
                                             <div class="flex space-x-2">
                                                 @php
-                                                    $progress = $verse->progress->first();
+                                                    $progress = $verse->user_progress;
                                                 @endphp
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
                                                     {{ $progress && $progress->is_read ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
@@ -63,8 +76,8 @@
                                         </div>
 
                                         <!-- Arabic Text -->
-                                        <div class="text-2xl arabic-text mb-3 text-right leading-loose">
-                                            {{ $verse->text_arabic }}
+                                        <div class="text-2xl arabic-text mb-3 text-right leading-loose" dir="rtl">
+                                            {{ $verse->arabic_text }}
                                         </div>
 
                                         <!-- Translation -->
@@ -80,34 +93,11 @@
                                         @endif
 
                                         <!-- Action Buttons -->
-                                        <div class="flex space-x-2 mt-4">
-                                            <form method="POST" action="{{ route('quran.progress.update', $verse->id) }}" class="inline">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="type" value="read">
-                                                <button type="submit" 
-                                                        class="text-sm px-3 py-1 rounded {{ $progress && $progress->is_read ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white' }}">
-                                                    {{ $progress && $progress->is_read ? 'Mark Unread' : 'Mark Read' }}
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="{{ route('quran.progress.update', $verse->id) }}" class="inline">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="type" value="understood">
-                                                <button type="submit" 
-                                                        class="text-sm px-3 py-1 rounded {{ $progress && $progress->is_understood ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white' }}">
-                                                    {{ $progress && $progress->is_understood ? 'Mark Not Understood' : 'Mark Understood' }}
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="{{ route('quran.progress.update', $verse->id) }}" class="inline">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="type" value="memorized">
-                                                <button type="submit" 
-                                                        class="text-sm px-3 py-1 rounded {{ $progress && $progress->is_memorized ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-purple-500 hover:text-white' }}">
-                                                    {{ $progress && $progress->is_memorized ? 'Mark Not Memorized' : 'Mark Memorized' }}
-                                                </button>
-                                            </form>
+                                        <div class="mt-4">
+                                            <a href="{{ route('quran.show', $verse->surah->surah_number) }}#verse-{{ $verse->verse_number }}" 
+                                               class="inline-flex items-center text-emerald-600 hover:text-emerald-800 text-sm font-medium">
+                                                📖 View in Surah Context →
+                                            </a>
                                         </div>
                                     </div>
                                 @endforeach
@@ -120,20 +110,22 @@
                     </div>
                 </div>
             @else
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200 text-center">
+                <div class="bg-white rounded-xl shadow-lg">
+                    <div class="p-6 text-center">
                         <div class="text-gray-500 py-8">
-                            Enter a search term to find verses in the Quran.
+                            <div class="text-4xl mb-4">📖</div>
+                            <p>Enter a search term to find verses in the Quran.</p>
+                            <p class="text-sm mt-2">You can search in Arabic text, English translation, or transliteration.</p>
                         </div>
                     </div>
                 </div>
             @endif
-        </div>
     </div>
+</div>
 
-    <style>
-        .arabic-text {
-            font-family: 'Amiri', 'Scheherazade New', serif;
-        }
-    </style>
-</x-app-layout>
+<style>
+    .arabic-text {
+        font-family: 'Amiri', 'Scheherazade New', serif;
+    }
+</style>
+@endsection

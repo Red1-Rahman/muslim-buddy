@@ -172,7 +172,8 @@ class QuranController extends Controller
             ->where('is_memorized', true)
             ->firstOrFail();
 
-        $progress->scheduleNextReview();
+        $difficulty = $request->input('difficulty', 'easy');
+        $progress->scheduleNextReview($difficulty);
 
         return response()->json([
             'success' => true,
@@ -186,12 +187,20 @@ class QuranController extends Controller
     public function dueReviews()
     {
         $user = Auth::user();
-        $dueVerses = UserVerseProgress::where('user_id', $user->id)
-            ->where('is_memorized', true)
-            ->where('next_review_at', '<=', now())
-            ->with('verse.surah')
-            ->orderBy('next_review_at')
-            ->get();
+        
+        try {
+            $dueVerses = UserVerseProgress::where('user_id', $user->id)
+                ->where('is_memorized', true)
+                ->whereNotNull('next_review_at')
+                ->where('next_review_at', '<=', now())
+                ->with(['verse.surah'])
+                ->orderBy('next_review_at')
+                ->get();
+        } catch (\Exception $e) {
+            // If there's an error, return empty collection and log it
+            \Log::error('Error in dueReviews: ' . $e->getMessage());
+            $dueVerses = collect([]);
+        }
 
         return view('quran.reviews', compact('dueVerses', 'user'));
     }
@@ -204,6 +213,10 @@ class QuranController extends Controller
         $query = $request->input('q');
         $user = Auth::user();
 
+        if (empty($query)) {
+            return view('quran.search', compact('query', 'user'))->with('verses', collect([]));
+        }
+
         $verses = Verse::where(function ($q) use ($query) {
             $q->where('arabic_text', 'like', "%{$query}%")
                 ->orWhere('translation_english', 'like', "%{$query}%")
@@ -213,6 +226,16 @@ class QuranController extends Controller
             ->with('surah')
             ->limit(50)
             ->get();
+
+        // Load user progress for these verses
+        $progressMap = UserVerseProgress::where('user_id', $user->id)
+            ->whereIn('verse_id', $verses->pluck('id'))
+            ->get()
+            ->keyBy('verse_id');
+
+        foreach ($verses as $verse) {
+            $verse->user_progress = $progressMap->get($verse->id);
+        }
 
         return view('quran.search', compact('verses', 'query', 'user'));
     }
