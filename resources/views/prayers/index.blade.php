@@ -39,7 +39,7 @@
                     <p class="text-3xl font-bold text-indigo-600 mb-3">{{ $time->format('h:i A') }}</p>
                     
                     <button 
-                        onclick="togglePrayer({{ $prayerLogs[$name]->id }})"
+                        onclick="togglePrayer({{ $prayerLogs[$name]->id }}, '{{ $name }}')"
                         class="w-full px-4 py-2 rounded-md text-sm font-medium transition {{ $prayerLogs[$name]->is_completed ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-indigo-600 text-white hover:bg-indigo-700' }}">
                         @if($prayerLogs[$name]->is_completed)
                         <i class="fas fa-check-circle mr-1"></i> Completed
@@ -165,8 +165,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function togglePrayer(prayerLogId) {
+function togglePrayer(prayerLogId, prayerName) {
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const button = document.querySelector(`button[onclick="togglePrayer(${prayerLogId}, '${prayerName}')"]`);
+    const prayerCard = button.closest('.text-center');
+    
+    // Disable button during request
+    button.disabled = true;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...';
     
     fetch(`/prayers/${prayerLogId}/toggle`, {
         method: 'POST',
@@ -179,11 +186,86 @@ function togglePrayer(prayerLogId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload();
+            // Update UI without full page reload
+            updatePrayerUI(prayerLogId, data.is_completed, button, prayerCard);
+            
+            // Store in localStorage for cross-page sync
+            const prayerUpdate = {
+                prayerLogId: prayerLogId,
+                isCompleted: data.is_completed,
+                points: data.points,
+                prayerName: prayerName,
+                timestamp: Date.now(),
+                source: 'prayers'
+            };
+            localStorage.setItem('prayerUpdate', JSON.stringify(prayerUpdate));
+            window.lastPrayersUpdate = prayerUpdate.timestamp;
+            
+            // Clear localStorage after 3 seconds to prevent stale data
+            setTimeout(() => {
+                const current = localStorage.getItem('prayerUpdate');
+                if (current) {
+                    const currentUpdate = JSON.parse(current);
+                    if (currentUpdate.timestamp === prayerUpdate.timestamp) {
+                        localStorage.removeItem('prayerUpdate');
+                    }
+                }
+            }, 3000);
+            
+            // Trigger custom event for other tabs/windows
+            window.dispatchEvent(new CustomEvent('prayerToggled', {
+                detail: prayerUpdate
+            }));
         }
+        
+        button.disabled = false;
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        button.disabled = false;
+        button.innerHTML = originalText;
+    });
 }
+
+function updatePrayerUI(prayerLogId, isCompleted, button, prayerCard) {
+    if (isCompleted) {
+        prayerCard.className = prayerCard.className.replace('bg-gray-50', 'bg-green-50 border-2 border-green-500');
+        button.className = button.className.replace('bg-indigo-600', 'bg-green-600').replace('hover:bg-indigo-700', 'hover:bg-green-700');
+        button.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Completed';
+    } else {
+        prayerCard.className = prayerCard.className.replace('bg-green-50 border-2 border-green-500', 'bg-gray-50');
+        button.className = button.className.replace('bg-green-600', 'bg-indigo-600').replace('hover:bg-green-700', 'hover:bg-indigo-700');
+        button.innerHTML = '<i class="fas fa-circle mr-1"></i> Mark Done';
+    }
+}
+
+// Listen for storage changes from other tabs
+window.addEventListener('storage', function(e) {
+    if (e.key === 'prayerUpdate' && e.newValue) {
+        const prayerUpdate = JSON.parse(e.newValue);
+        if (prayerUpdate.prayerName && prayerUpdate.timestamp > (window.lastPrayersUpdate || 0)) {
+            const button = document.querySelector(`button[onclick="togglePrayer(${prayerUpdate.prayerLogId}, '${prayerUpdate.prayerName}')"]`);
+            if (button) {
+                const prayerCard = button.closest('.text-center');
+                updatePrayerUI(prayerUpdate.prayerLogId, prayerUpdate.isCompleted, button, prayerCard);
+                window.lastPrayersUpdate = prayerUpdate.timestamp;
+            }
+        }
+    }
+});
+
+// Listen for custom events in same tab
+window.addEventListener('prayerToggled', function(e) {
+    const prayerUpdate = e.detail;
+    if (prayerUpdate.prayerName && prayerUpdate.timestamp > (window.lastPrayersUpdate || 0)) {
+        const button = document.querySelector(`button[onclick="togglePrayer(${prayerUpdate.prayerLogId}, '${prayerUpdate.prayerName}')"]`);
+        if (button && prayerUpdate.source !== 'prayers') {
+            const prayerCard = button.closest('.text-center');
+            updatePrayerUI(prayerUpdate.prayerLogId, prayerUpdate.isCompleted, button, prayerCard);
+            window.lastPrayersUpdate = prayerUpdate.timestamp;
+        }
+    }
+});
 </script>
 @endpush
 @endsection
