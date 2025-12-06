@@ -1,24 +1,8 @@
-﻿<div align="center">
-  <img src="Muslim Buddy.svg" alt="Muslim Buddy Logo" width="200"/>
-  
-  # Muslim Buddy
-  ### Islamic Companion Web Application
-  
-  [![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
-  [![PHP](https://img.shields.io/badge/PHP-8.2+-blue.svg)](https://php.net)
-  [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-  
-  **Developed by Redwan Rahman** ([github.com/Red1-Rahman](https://github.com/Red1-Rahman))
-  
-  *Bridging Islamic tradition with modern technology*
-  
-  A comprehensive Laravel web application for Muslims to track their spiritual journey, featuring astronomical prayer time calculations, Quran progress tracking, authentic hadith collections, and community leaderboards.
-  
-  [Features](#-features) • [Installation](#-installation--setup) • [Usage](#-usage-guide) • [Contributing](CONTRIBUTING.md) • [Deployment](#-deployment-options)
-  
-</div>
+﻿# Muslim Buddy - Islamic Companion Web Application
 
----
+**Developed by Redwan Rahman** ([github.com/Red1-Rahman](https://github.com/Red1-Rahman))
+
+A comprehensive Laravel web application for Muslims to track their spiritual journey, featuring prayer times calculation using astronomical formulas, Quran progress tracking, and community leaderboards.
 
 ## 🌟 Features
 
@@ -320,15 +304,10 @@ The application can be deployed for free on several platforms:
 
 ## 🤝 Contributing
 
-We need your help to expand Islamic content! See our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### 📖 Help Needed
-
-- **Quran Contributors**: 6,000+ verses to populate (1-2 hrs/week)
-- **Hadith Verifiers**: Authentic hadith collections (2-3 hrs/week)
-- **Prayer Time Experts**: Astronomical calculations validation (1-2 hrs/week)
-
-**Volunteer**: Create issue with "Volunteer: [Role]" or email redwanrahaman2002@outlook.com
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ## 📈 Current Status
 
@@ -364,27 +343,18 @@ This project is open-sourced under the MIT License.
 **Redwan Rahman**
 
 - GitHub: [Red1-Rahman](https://github.com/Red1-Rahman)
-- Email: redwanrahaman2002@outlook.com
 - Islamic astronomy and prayer time calculation specialist
 - Full-stack Laravel developer
 
----
+## 🙏 Acknowledgments
 
-<div align="center">
-  
-### 🌙 Design Philosophy
-
-Our logo symbolizes the perfect harmony between Islamic tradition and modern technology:
-
-- **Crescent Moon**: Islamic heritage and lunar calendar
-- **Circuit Pattern**: Modern technology and innovation
-- **Location Pin**: Global accessibility and precision
-- **Color Palette**: Deep emerald green (Islamic tradition), gold (excellence), and white (purity)
+- **Jean Meeus** - "Astronomical Algorithms" book
+- **Islamic Society of North America** - Prayer time calculation methods
+- **Quran.com** - Quranic text and translations
+- **Laravel Community** - Framework and packages
 
 ---
 
-_May Allah accept our efforts and make this application beneficial for the Muslim community worldwide. Ameen._
+_May Allah accept our efforts and make this application beneficial for the Muslim community. Ameen._
 
 **"And establish prayer and give zakah and bow with those who bow [in worship and obedience]."** - Quran 2:43
-
-</div>
