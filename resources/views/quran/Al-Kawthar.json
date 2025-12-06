@@ -1,10 +1,26 @@
 {
-    "surah": {
-        "number": 108,
-        "name": null,
-        "arabic_name": null,
-        "english_name": null,
-        "number_of_ayah": null,
-        "ayahs": []
-    }
+  "surah": {
+    "number": 108,
+    "name": "Al-Kawthar",
+    "arabic_name": "الكوثر",
+    "english_name": "The Abundance",
+    "number_of_ayah": 3,
+    "ayahs": [
+      {
+        "number": 1,
+        "arabic": "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ",
+        "english": "Indeed, We have granted you [O Muhammad] al-Kawthar."
+      },
+      {
+        "number": 2,
+        "arabic": "فَصَلِّ لِرَبِّكَ وَانْحَرْ",
+        "english": "So pray to your Lord and sacrifice [to Him alone]."
+      },
+      {
+        "number": 3,
+        "arabic": "إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ",
+        "english": "Indeed, your enemy is the one cut off."
+      }
+    ]
+  }
 }

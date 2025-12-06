@@ -1,10 +1,61 @@
 {
-    "surah": {
+  "surah": {
+    "number": 2,
+    "name": "Al-Baqarah",
+    "arabic_name": "البقرة",
+    "english_name": "The Cow",
+    "number_of_ayah": 286,
+    "ayahs": [
+      {
+        "number": 1,
+        "arabic": "الم",
+        "english": "Alif, Laam, Meem."
+      },
+      {
         "number": 2,
-        "name": null,
-        "arabic_name": null,
-        "english_name": null,
-        "number_of_ayah": null,
-        "ayahs": []
-    }
+        "arabic": "ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِّلْمُتَّقِينَ",
+        "english": "This is the Book about which there is no doubt, a guidance for those conscious of Allah."
+      },
+      {
+        "number": 3,
+        "arabic": "الَّذِينَ يُؤْمِنُونَ بِالْغَيْبِ وَيُقِيمُونَ الصَّلَاةَ وَمِمَّا رَزَقْنَاهُمْ يُنفِقُونَ",
+        "english": "Who believe in the unseen, establish prayer, and spend out of what We have provided for them."
+      },
+      {
+        "number": 4,
+        "arabic": "وَالَّذِينَ يُؤْمِنُونَ بِمَا أُنزِلَ إِلَيْكَ وَمَا أُنزِلَ مِن قَبْلِكَ وَبِالْآخِرَةِ هُمْ يُوقِنُونَ",
+        "english": "And who believe in what has been revealed to you, [O Muhammad], and what was revealed before you, and of the Hereafter they are certain [in faith]."
+      },
+      {
+        "number": 5,
+        "arabic": "أُولَٰئِكَ عَلَىٰ هُدًى مِّن رَّبِّهِمْ وَأُولَٰئِكَ هُمُ الْمُفْلِحُونَ",
+        "english": "Those are upon [right] guidance from their Lord, and it is those who are the successful."
+      },
+      {
+        "number": 6,
+        "arabic": null,
+        "english": null
+      },
+      {
+        "number": 7,
+        "arabic": null,
+        "english": null
+      },
+      {
+        "number": 8,
+        "arabic": null,
+        "english": null
+      },
+      {
+        "number": 9,
+        "arabic": null,
+        "english": null
+      },
+      {
+        "number": 10,
+        "arabic": null,
+        "english": null
+      }
+    ]
+  }
 }

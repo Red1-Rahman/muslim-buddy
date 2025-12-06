@@ -10,6 +10,9 @@
     <div class="flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div class="text-center">
+                <div class="mx-auto h-16 w-16 flex items-center justify-center mb-4">
+                    <img src="{{ asset('Muslim Buddy.svg') }}" alt="Muslim Buddy Logo" class="h-16 w-16">
+                </div>
                 <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
                     Forgot your password?
                 </h2>

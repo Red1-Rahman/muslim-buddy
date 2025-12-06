@@ -274,7 +274,7 @@ class QuranController extends Controller
                     ->where('user_verse_progress.user_id', '=', $user->id)
                     ->where('user_verse_progress.is_read', '=', true);
             })
-            ->select('verses.juz', DB::raw('COUNT(*) as total'), DB::raw('COUNT(user_verse_progress.id) as read'))
+            ->select('verses.juz', DB::raw('COUNT(*) as total'), DB::raw('COUNT(user_verse_progress.id) as `read`'))
             ->whereNotNull('verses.juz')
             ->groupBy('verses.juz')
             ->orderBy('verses.juz')

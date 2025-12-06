@@ -5,8 +5,8 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">
-            <i class="fas fa-book-quran text-indigo-600"></i> Holy Quran
+        <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+            <img src="{{ asset('Quran Circular Cropped.svg') }}" alt="Quran" class="h-10 w-10 mr-3"> Holy Quran
         </h1>
         <p class="text-gray-600 mt-1">Track your reading, understanding, and memorization progress</p>
     </div>

@@ -7,7 +7,9 @@
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-emerald-900 mb-2">📚 Quran Reviews</h1>
+            <h1 class="text-4xl font-bold text-emerald-900 mb-2 flex items-center justify-center">
+                <img src="{{ asset('Quran Circular Cropped.svg') }}" alt="Quran" class="h-12 w-12 mr-3"> Quran Reviews
+            </h1>
             <p class="text-gray-600 max-w-2xl mx-auto">
                 Review memorized verses using spaced repetition to strengthen your memorization
             </p>
@@ -24,7 +26,9 @@
         @if($dueVerses->isEmpty())
             <!-- No Reviews Due -->
             <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-                <div class="text-6xl mb-4">✅</div>
+                <div class="flex justify-center mb-4">
+                    <img src="{{ asset('Quran Circular Cropped.svg') }}" alt="Quran" class="h-20 w-20">
+                </div>
                 <h3 class="text-2xl font-bold text-gray-800 mb-4">All Caught Up!</h3>
                 <p class="text-gray-600 mb-6">
                     You have no verses due for review at this time. Great job keeping up with your memorization!
@@ -119,7 +123,7 @@
                                 </button>
                                 <a href="{{ route('quran.show', $surah->surah_number) }}#verse-{{ $verse->verse_number }}"
                                    class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200">
-                                    📖 View in Context
+                                    <img src="{{ asset('Quran Circular Cropped.svg') }}" alt="" class="h-4 w-4 inline mr-1"> View in Context
                                 </a>
                             </div>
                         </div>

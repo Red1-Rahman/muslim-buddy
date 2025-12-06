@@ -2,10 +2,8 @@
     <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div>
-                <div class="mx-auto h-12 w-12 text-green-600">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                    </svg>
+                <div class="mx-auto h-16 w-16 flex items-center justify-center">
+                    <img src="{{ asset('Muslim Buddy.svg') }}" alt="Muslim Buddy Logo" class="h-16 w-16">
                 </div>
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
                     Sign in to Muslim Buddy

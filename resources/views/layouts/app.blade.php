@@ -41,8 +41,9 @@
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="{{ route('dashboard') }}" class="text-2xl font-bold text-indigo-600">
-                            <i class="fas fa-mosque"></i> Muslim Buddy
+                        <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
+                            <img src="{{ asset('Muslim Buddy.svg') }}" alt="Muslim Buddy Logo" class="h-10 w-10">
+                            <span class="text-2xl font-bold text-emerald-600">Muslim Buddy</span>
                         </a>
                     </div>
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">

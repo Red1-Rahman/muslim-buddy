@@ -96,7 +96,7 @@
                                         <div class="mt-4">
                                             <a href="{{ route('quran.show', $verse->surah->surah_number) }}#verse-{{ $verse->verse_number }}" 
                                                class="inline-flex items-center text-emerald-600 hover:text-emerald-800 text-sm font-medium">
-                                                📖 View in Surah Context →
+                                                <img src="{{ asset('Quran Circular Cropped.svg') }}" alt="" class="h-4 w-4 inline mr-1"> View in Surah Context →
                                             </a>
                                         </div>
                                     </div>
@@ -113,7 +113,9 @@
                 <div class="bg-white rounded-xl shadow-lg">
                     <div class="p-6 text-center">
                         <div class="text-gray-500 py-8">
-                            <div class="text-4xl mb-4">📖</div>
+                            <div class="flex justify-center mb-4">
+                                <img src="{{ asset('Quran Circular Cropped.svg') }}" alt="Quran" class="h-16 w-16">
+                            </div>
                             <p>Enter a search term to find verses in the Quran.</p>
                             <p class="text-sm mt-2">You can search in Arabic text, English translation, or transliteration.</p>
                         </div>

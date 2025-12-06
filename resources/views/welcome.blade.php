@@ -22,13 +22,9 @@
             <header class="bg-white shadow-sm">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center py-6">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 text-green-600">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                                </svg>
-                            </div>
-                            <h1 class="ml-3 text-2xl font-bold text-gray-900">Muslim Buddy</h1>
+                        <div class="flex items-center space-x-3">
+                            <img src="{{ asset('Muslim Buddy.svg') }}" alt="Muslim Buddy Logo" class="h-12 w-12">
+                            <h1 class="text-2xl font-bold text-gray-900">Muslim Buddy</h1>
                         </div>
                         
                         <nav class="flex items-center space-x-4">
