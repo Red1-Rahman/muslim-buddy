@@ -1,6 +1,5 @@
 ﻿# Muslim Buddy - Islamic Companion Web Application
 
-**Developed by Redwan Rahman** ([github.com/Red1-Rahman](https://github.com/Red1-Rahman))
 
 A comprehensive Laravel web application for Muslims to track their spiritual journey, featuring prayer times calculation using astronomical formulas, Quran progress tracking, and community leaderboards.
 
