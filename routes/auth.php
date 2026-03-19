@@ -92,13 +92,13 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
     }
 
     try {
-        $user = User::where('email', $googleUser->getEmail())
+        $user = User::whereRaw('email = :email', ['email' => $googleUser->getEmail()])
             ->get()
             ->first();
 
         if (!$user) {
             try {
-                $user = User::where('google_id', $googleUser->getId())
+                $user = User::whereRaw('google_id = :google_id', ['google_id' => $googleUser->getId()])
                     ->get()
                     ->first();
             } catch (\Throwable $e) {
