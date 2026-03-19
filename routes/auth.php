@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -74,6 +76,10 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
     try {
         $googleUser = Socialite::driver('google')->user();
     } catch (\Throwable $e) {
+        Log::error('Google Socialite callback token exchange failed', [
+            'error' => $e->getMessage(),
+        ]);
+
         return redirect()->route('login')->withErrors([
             'email' => 'Google sign-in failed. Please try again.',
         ]);
@@ -85,43 +91,65 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
         ]);
     }
 
-    $user = User::where('email', $googleUser->getEmail())
-        ->orWhere('google_id', $googleUser->getId())
-        ->first();
+    try {
+        $hasGoogleIdColumn = Schema::hasColumn('users', 'google_id');
 
-    if (!$user) {
-        $user = User::create([
-            'name' => $googleUser->getName() ?: $googleUser->getNickname() ?: 'Google User',
+        $userQuery = User::where('email', $googleUser->getEmail());
+
+        if ($hasGoogleIdColumn) {
+            $userQuery->orWhere('google_id', $googleUser->getId());
+        }
+
+        $user = $userQuery->first();
+
+        if (!$user) {
+            $createData = [
+                'name' => $googleUser->getName() ?: $googleUser->getNickname() ?: 'Google User',
+                'email' => $googleUser->getEmail(),
+                'email_verified_at' => now(),
+                'avatar' => $googleUser->getAvatar(),
+                'password' => Hash::make(Str::random(40)),
+            ];
+
+            if ($hasGoogleIdColumn) {
+                $createData['google_id'] = $googleUser->getId();
+            }
+
+            $user = User::create($createData);
+        } else {
+            $updates = [];
+
+            if ($hasGoogleIdColumn && empty($user->google_id)) {
+                $updates['google_id'] = $googleUser->getId();
+            }
+
+            if (!$user->email_verified_at) {
+                $updates['email_verified_at'] = now();
+            }
+
+            if (!$user->avatar && $googleUser->getAvatar()) {
+                $updates['avatar'] = $googleUser->getAvatar();
+            }
+
+            if (!empty($updates)) {
+                $user->update($updates);
+            }
+        }
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        return redirect()->intended('/dashboard');
+    } catch (\Throwable $e) {
+        Log::error('Google login user sync failed', [
+            'error' => $e->getMessage(),
             'email' => $googleUser->getEmail(),
-            'google_id' => $googleUser->getId(),
-            'email_verified_at' => now(),
-            'avatar' => $googleUser->getAvatar(),
-            'password' => Hash::make(Str::random(40)),
         ]);
-    } else {
-        $updates = [];
 
-        if (!$user->google_id) {
-            $updates['google_id'] = $googleUser->getId();
-        }
-
-        if (!$user->email_verified_at) {
-            $updates['email_verified_at'] = now();
-        }
-
-        if (!$user->avatar && $googleUser->getAvatar()) {
-            $updates['avatar'] = $googleUser->getAvatar();
-        }
-
-        if (!empty($updates)) {
-            $user->update($updates);
-        }
+        return redirect()->route('login')->withErrors([
+            'email' => 'Google sign-in failed due to a server issue. Please try again shortly.',
+        ]);
     }
-
-    Auth::login($user, true);
-    $request->session()->regenerate();
-
-    return redirect()->intended('/dashboard');
 })->middleware('guest')->name('auth.google.callback');
 
 // Password Reset Routes
