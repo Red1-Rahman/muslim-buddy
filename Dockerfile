@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     unzip \
     git \
     sqlite \
+    sqlite-dev \
     nginx \
     supervisor
 
