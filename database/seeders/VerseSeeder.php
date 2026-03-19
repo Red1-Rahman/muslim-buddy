@@ -15,6 +15,7 @@ class VerseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Ensure no stale Laravel config cache affects these env reads
         $baseUrl = rtrim(env('QURAN_API_BASE_URL', 'https://api.quran.com/api/v4'), '/');
         $script = env('QURAN_API_SCRIPT', 'uthmani');
         $perPage = max(1, min((int) env('QURAN_API_PER_PAGE', 50), 50));
@@ -30,8 +31,12 @@ class VerseSeeder extends Seeder
             $authToken = env('QURAN_API_CLIENT_SECRET');
         }
 
-        $publicHost = str_contains($baseUrl, 'api.quran.com/api/v4');
-        $useAuthHeaders = !$publicHost && !empty($clientId) && !empty($authToken);
+        $publicHost = str_contains(strtolower($baseUrl), 'api.quran.com');
+        $useAuthHeaders = !$publicHost
+            && !empty($clientId)
+            && !empty($authToken);
+
+        $this->command?->info("Auth mode: " . ($useAuthHeaders ? 'authenticated' : 'public (no headers)'));
 
         if (!$useAuthHeaders) {
             $this->command?->warn('Quran API credentials missing/partial. Attempting unauthenticated request.');
@@ -161,11 +166,21 @@ class VerseSeeder extends Seeder
             return;
         }
 
-        $transliterationUpdated = $this->importVerseTransliterations();
+        $transliterationUpdated = $this->importVerseTransliterations(
+            $baseUrl,
+            $useAuthHeaders,
+            $clientId,
+            $authToken
+        );
         $this->command?->info("Transliteration sync complete. Total verses updated: {$transliterationUpdated}");
     }
 
-    private function importVerseTransliterations(): int
+    private function importVerseTransliterations(
+        string $baseUrl,
+        bool $useAuthHeaders,
+        ?string $clientId,
+        ?string $authToken
+    ): int
     {
         $this->command?->info('Importing verse transliterations (word-by-word)...');
 
@@ -176,10 +191,18 @@ class VerseSeeder extends Seeder
 
             while (true) {
                 try {
-                    $response = Http::acceptJson()
+                    $request = Http::acceptJson()
                         ->retry(2, 300)
-                        ->timeout(30)
-                        ->get("https://api.quran.com/api/v4/verses/by_chapter/{$chapter}", [
+                        ->timeout(30);
+
+                    if ($useAuthHeaders) {
+                        $request = $request->withHeaders([
+                            'x-client-id' => $clientId,
+                            'x-auth-token' => $authToken,
+                        ]);
+                    }
+
+                    $response = $request->get("{$baseUrl}/verses/by_chapter/{$chapter}", [
                             'words' => 'true',
                             'word_fields' => 'transliteration',
                             'per_page' => 50,
