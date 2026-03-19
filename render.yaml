@@ -11,12 +11,20 @@ services:
         value: false
       - key: APP_KEY
         sync: false
+      - key: APP_URL
+        value: https://muslim-buddy.onrender.com
       - key: DB_CONNECTION
         value: libsql
       - key: TURSO_DB_URL
         sync: false
       - key: TURSO_DB_TOKEN
         sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://muslim-buddy.onrender.com/auth/google/callback
       - key: QURAN_API_BASE_URL
         value: https://api.quran.com/api/v4
       - key: QURAN_RECITATION_ID
