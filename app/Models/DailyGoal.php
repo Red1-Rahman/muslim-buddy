@@ -56,8 +56,12 @@ class DailyGoal extends Model
      */
     public function updateVerseProgress(): void
     {
+        $startDate = $this->goal_date . ' 00:00:00';
+        $endDate = $this->goal_date . ' 23:59:59';
+
         $count = UserVerseProgress::where('user_id', $this->user_id)
-            ->whereDate('read_at', $this->goal_date)
+            ->where('read_at', '>=', $startDate)
+            ->where('read_at', '<=', $endDate)
             ->where('is_read', true)
             ->count();
 
