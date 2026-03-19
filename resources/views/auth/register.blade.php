@@ -67,6 +67,13 @@
                     </button>
                 </div>
 
+                <div>
+                    <a href="{{ route('auth.google.redirect') }}"
+                       class="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Continue with Google
+                    </a>
+                </div>
+
                 <div class="text-center">
                     <span class="text-sm text-gray-600">
                         Already have an account? 
