@@ -17,14 +17,18 @@ RUN apk add --no-cache \
 RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite pcntl bcmath gd xml
 
 # Install libsql PHP extension for Turso
-RUN curl -fsSL https://github.com/tursodatabase/turso-client-php/releases/download/v0.1.3/turso-client-php_Linux_x86_64.tar.gz \
-    -o /tmp/libsql.tar.gz \
+RUN ARCH=$(uname -m) \
+    && LIBSQL_VERSION=$(curl -fsSL https://api.github.com/repos/tursodatabase/turso-client-php/releases/latest \
+        | grep '"tag_name"' | sed 's/.*"tag_name": "\(.*\)".*/\1/') \
+    && echo "Installing libsql version: $LIBSQL_VERSION for arch: $ARCH" \
+    && curl -fsSL "https://github.com/tursodatabase/turso-client-php/releases/download/${LIBSQL_VERSION}/turso-client-php_Linux_x86_64.tar.gz" \
+        -o /tmp/libsql.tar.gz \
     && mkdir -p /tmp/libsql \
     && tar -xzf /tmp/libsql.tar.gz -C /tmp/libsql \
-    && cp /tmp/libsql/libsql_php.so $(php -r "echo ini_get('extension_dir');")/ \
+    && find /tmp/libsql -name "*.so" -exec cp {} $(php -r "echo ini_get('extension_dir');")/ \; \
     && echo "extension=libsql_php.so" > /usr/local/etc/php/conf.d/libsql.ini \
     && rm -rf /tmp/libsql /tmp/libsql.tar.gz \
-    && php -m | grep libsql && echo "libsql extension loaded" || echo "libsql extension NOT loaded"
+    && php -m | grep libsql && echo "libsql OK" || echo "libsql FAILED"
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
