@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: muslim-buddy
+    env: php
+    plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        sync: false
+      - key: DB_CONNECTION
+        value: turso
+      - key: TURSO_DB_URL
+        sync: false
+      - key: TURSO_DB_TOKEN
+        sync: false
+      - key: QURAN_API_BASE_URL
+        value: https://api.quran.com/api/v4
+      - key: QURAN_RECITATION_ID
+        value: 7
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: LOG_CHANNEL
+        value: stderr
