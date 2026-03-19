@@ -292,20 +292,16 @@ class VerseSeeder extends Seeder
         $transliteration = data_get($word, 'transliteration');
 
         if (is_string($transliteration)) {
-            return trim($transliteration);
+            $text = trim($transliteration);
+            return strtolower($text) === 'english' ? '' : $text;
         }
 
         if (is_array($transliteration)) {
             $text = data_get($transliteration, 'text');
 
             if (is_string($text)) {
-                return trim($text);
-            }
-
-            foreach ($transliteration as $value) {
-                if (is_string($value) && trim($value) !== '') {
-                    return trim($value);
-                }
+                $value = trim($text);
+                return strtolower($value) === 'english' ? '' : $value;
             }
         }
 
