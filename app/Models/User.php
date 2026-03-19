@@ -39,6 +39,8 @@ class User extends Authenticatable
         'enable_night_mode',
         'auto_mark_prayers',
         'congregation_points_bonus',
+        'zakat_paid_this_year',
+        'zakat_paid_year',
     ];
 
     /**
@@ -66,6 +68,7 @@ class User extends Authenticatable
         'enable_night_mode' => 'boolean',
         'auto_mark_prayers' => 'boolean',
         'congregation_points_bonus' => 'boolean',
+        'zakat_paid_this_year' => 'boolean',
         'reminder_minutes' => 'integer',
         'daily_verse_goal' => 'integer',
     ];

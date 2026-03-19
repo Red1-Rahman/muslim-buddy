@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PrayerController;
 use App\Http\Controllers\QuranController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\ZakatController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -63,6 +64,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [LeaderboardController::class, 'index'])->name('index');
         Route::get('/user/{userId}', [LeaderboardController::class, 'userStats'])->name('user-stats');
     });
+
+    // Zakat routes
+    Route::get('/zakat', [ZakatController::class, 'calculator'])->name('zakat.calculator');
+    Route::post('/zakat/mark-paid', [ZakatController::class, 'markPaid'])->name('zakat.markPaid');
 });
 
 // Hadith routes (some public, some require auth)
