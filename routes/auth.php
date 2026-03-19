@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
+use Laravel\Socialite\Facades\Socialite;
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -56,6 +57,72 @@ Route::post('/logout', function (Illuminate\Http\Request $request) {
     $request->session()->regenerateToken();
     return redirect('/');
 })->name('logout');
+
+Route::get('/auth/google/redirect', function () {
+    if (!config('services.google.client_id') || !config('services.google.client_secret') || !config('services.google.redirect')) {
+        return redirect()->route('login')->withErrors([
+            'email' => 'Google login is not configured yet.',
+        ]);
+    }
+
+    return Socialite::driver('google')
+        ->scopes(['openid', 'profile', 'email'])
+        ->redirect();
+})->middleware('guest')->name('auth.google.redirect');
+
+Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) {
+    try {
+        $googleUser = Socialite::driver('google')->user();
+    } catch (\Throwable $e) {
+        return redirect()->route('login')->withErrors([
+            'email' => 'Google sign-in failed. Please try again.',
+        ]);
+    }
+
+    if (!$googleUser->getEmail()) {
+        return redirect()->route('login')->withErrors([
+            'email' => 'Google account did not provide an email address.',
+        ]);
+    }
+
+    $user = User::where('email', $googleUser->getEmail())
+        ->orWhere('google_id', $googleUser->getId())
+        ->first();
+
+    if (!$user) {
+        $user = User::create([
+            'name' => $googleUser->getName() ?: $googleUser->getNickname() ?: 'Google User',
+            'email' => $googleUser->getEmail(),
+            'google_id' => $googleUser->getId(),
+            'email_verified_at' => now(),
+            'avatar' => $googleUser->getAvatar(),
+            'password' => Hash::make(Str::random(40)),
+        ]);
+    } else {
+        $updates = [];
+
+        if (!$user->google_id) {
+            $updates['google_id'] = $googleUser->getId();
+        }
+
+        if (!$user->email_verified_at) {
+            $updates['email_verified_at'] = now();
+        }
+
+        if (!$user->avatar && $googleUser->getAvatar()) {
+            $updates['avatar'] = $googleUser->getAvatar();
+        }
+
+        if (!empty($updates)) {
+            $user->update($updates);
+        }
+    }
+
+    Auth::login($user, true);
+    $request->session()->regenerate();
+
+    return redirect()->intended('/dashboard');
+})->middleware('guest')->name('auth.google.callback');
 
 // Password Reset Routes
 Route::get('/forgot-password', function () {
