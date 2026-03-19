@@ -29,6 +29,12 @@
                 </div>
             </div>
 
+            @if($surah->description)
+            <blockquote class="bg-white border-l-4 border-emerald-500 rounded-r-lg shadow p-4 mb-6 text-gray-700">
+                {{ $surah->description }}
+            </blockquote>
+            @endif
+
             @if($audioUrl)
             <div class="audio-player my-4">
                 <audio controls preload="none" class="w-full">

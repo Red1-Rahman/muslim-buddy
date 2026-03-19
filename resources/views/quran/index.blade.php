@@ -77,6 +77,9 @@
                     <div>
                         <h3 class="font-bold text-lg">{{ $surah->surah_number }}. {{ $surah->name_english }}</h3>
                         <p class="text-indigo-100 text-sm">{{ $surah->name_transliteration }}</p>
+                        @if($surah->description)
+                        <p class="text-indigo-100 text-xs mt-1 line-clamp-2">{{ $surah->description }}</p>
+                        @endif
                     </div>
                     <div class="text-right arabic-text text-xl">
                         {{ $surah->name_arabic }}

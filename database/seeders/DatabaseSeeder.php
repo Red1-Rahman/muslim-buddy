@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SurahSeeder::class,
+            SurahInfoSeeder::class,
             VerseSeeder::class,
             HadithSeeder::class,
         ]);
