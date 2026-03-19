@@ -2,109 +2,144 @@
 
 namespace Database\Seeders;
 
+use App\Models\Surah;
 use App\Models\Verse;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Http;
 
 class VerseSeeder extends Seeder
 {
     /**
-     * Seed the verses table with sample Quran verses
-     * Note: This is a sample with Al-Fatiha. For complete Quran, you would need all 6,236 verses.
+     * Seed the verses table from Quran Foundation API.
      */
     public function run(): void
     {
-        // Al-Fatiha (Chapter 1) - Complete from JSON data
-        $verses = [
-            [
-                'surah_number' => 1,
-                'verse_number' => 1,
-                'arabic_text' => 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-                'translation_english' => 'In the name of Allah, the Most Gracious, the Most Merciful.',
-                'transliteration' => 'Bismi Allahi alrrahmani alrraheemi',
-                'juz' => 1,
-                'page' => 1,
-            ],
-            [
-                'surah_number' => 1,
-                'verse_number' => 2,
-                'arabic_text' => 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ',
-                'translation_english' => 'All praise is due to Allah, Lord of the worlds.',
-                'transliteration' => 'Alhamdu lillahi rabbi alAAalameena',
-                'juz' => 1,
-                'page' => 1,
-            ],
-            [
-                'surah_number' => 1,
-                'verse_number' => 3,
-                'arabic_text' => 'الرَّحْمَٰنِ الرَّحِيمِ',
-                'translation_english' => 'The Most Gracious, the Most Merciful.',
-                'transliteration' => 'Alrrahmani alrraheemi',
-                'juz' => 1,
-                'page' => 1,
-            ],
-            [
-                'surah_number' => 1,
-                'verse_number' => 4,
-                'arabic_text' => 'مَالِكِ يَوْمِ الدِّينِ',
-                'translation_english' => 'Master of the Day of Judgment.',
-                'transliteration' => 'Maliki yawmi alddeeni',
-                'juz' => 1,
-                'page' => 1,
-            ],
-            [
-                'surah_number' => 1,
-                'verse_number' => 5,
-                'arabic_text' => 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ',
-                'translation_english' => 'You alone we worship, and You alone we ask for help.',
-                'transliteration' => 'Iyyaka naAAbudu wa-iyyaka nastaAAeenu',
-                'juz' => 1,
-                'page' => 1,
-            ],
-            [
-                'surah_number' => 1,
-                'verse_number' => 6,
-                'arabic_text' => 'اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ',
-                'translation_english' => 'Guide us to the straight path,',
-                'transliteration' => 'Ihdina alssirata almustaqeema',
-                'juz' => 1,
-                'page' => 1,
-            ],
-            [
-                'surah_number' => 1,
-                'verse_number' => 7,
-                'arabic_text' => 'صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ',
-                'translation_english' => 'The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray.',
-                'transliteration' => 'Sirata allatheena anAAamta AAalayhim ghayri almaghdoobi AAalayhim wala alddalleena',
-                'juz' => 1,
-                'page' => 1,
-            ],
-            // Sample verses from other chapters for demonstration
-            [
-                'surah_number' => 2,
-                'verse_number' => 1,
-                'arabic_text' => 'الٓمٓ',
-                'translation_english' => 'Alif, Lam, Meem.',
-                'transliteration' => 'Alif-lam-meem',
-                'juz' => 1,
-                'page' => 2,
-            ],
-            [
-                'surah_number' => 2,
-                'verse_number' => 2,
-                'arabic_text' => 'ذَ ٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَ ۛ فِیهِ ۛ هُدࣰى لِّلۡمُتَّقِینَ',
-                'translation_english' => 'This is the Book about which there is no doubt, a guidance for those conscious of Allah -',
-                'transliteration' => 'Thalika alkitabu la rayba feehi hudan lilmuttaqeena',
-                'juz' => 1,
-                'page' => 2,
-            ],
-        ];
+        $baseUrl = rtrim(env('QURAN_API_BASE_URL', 'https://api.quran.com/api/v4'), '/');
+        $script = env('QURAN_API_SCRIPT', 'uthmani');
+        $perPage = max(1, min((int) env('QURAN_API_PER_PAGE', 50), 50));
+        $maxPages = (int) env('QURAN_API_MAX_PAGES', 0);
 
-        foreach ($verses as $verse) {
-            Verse::create($verse);
+        $clientId = env('QURAN_API_CLIENT_ID');
+        $authToken = env('QURAN_API_AUTH_TOKEN');
+
+        if (empty($authToken)) {
+            $authToken = env('QURAN_API_CLIENT_SECRET');
         }
 
-        // You would need to add all 6,236 verses here for the complete Quran
-        // This can be done by importing from a Quran API or database
-        echo "Sample verses seeded. For complete Quran, please import all 6,236 verses.\n";
+        $publicHost = str_contains($baseUrl, 'api.quran.com/api/v4');
+        $useAuthHeaders = !$publicHost && !empty($clientId) && !empty($authToken);
+
+        if (!$useAuthHeaders) {
+            $this->command?->warn('Quran API credentials missing/partial. Attempting unauthenticated request.');
+        }
+
+        $scriptField = 'text_' . $script;
+        $page = 1;
+        $totalPages = 1;
+        $imported = 0;
+        $revelationMap = Surah::query()
+            ->pluck('revelation_type', 'surah_number')
+            ->all();
+
+        $this->command?->info("Importing Quran verses from API using script: {$script}");
+
+        do {
+            $request = Http::acceptJson()
+                ->retry(3, 500)
+                ->timeout(45);
+
+            if ($useAuthHeaders) {
+                $request = $request->withHeaders([
+                    'x-client-id' => $clientId,
+                    'x-auth-token' => $authToken,
+                ]);
+            }
+
+            $response = $request->get("{$baseUrl}/quran/verses/{$script}", [
+                'page' => $page,
+                'per_page' => $perPage,
+            ]);
+
+            if (!$response->successful()) {
+                $status = $response->status();
+                $this->command?->error("Failed fetching page {$page} (HTTP {$status}).");
+                break;
+            }
+
+            $payload = $response->json();
+            $apiVerses = data_get($payload, 'verses', []);
+
+            if (!is_array($apiVerses) || empty($apiVerses)) {
+                $this->command?->warn("No verses returned on page {$page}. Stopping import.");
+                break;
+            }
+
+            $now = Carbon::now();
+            $rows = [];
+
+            foreach ($apiVerses as $item) {
+                $surahNumber = (int) data_get($item, 'chapter_id');
+                $verseNumber = (int) data_get($item, 'verse_number');
+
+                if (($surahNumber < 1 || $verseNumber < 1) && !empty(data_get($item, 'verse_key'))) {
+                    [$surahFromKey, $verseFromKey] = array_pad(explode(':', (string) data_get($item, 'verse_key'), 2), 2, null);
+                    $surahNumber = (int) $surahFromKey;
+                    $verseNumber = (int) $verseFromKey;
+                }
+
+                if ($surahNumber < 1 || $verseNumber < 1) {
+                    continue;
+                }
+
+                $arabicText = (string) (data_get($item, $scriptField) ?: data_get($item, 'text_uthmani') ?: data_get($item, 'text_imlaei') ?: '');
+
+                if ($arabicText === '') {
+                    continue;
+                }
+
+                $rows[] = [
+                    'surah_number' => $surahNumber,
+                    'verse_number' => $verseNumber,
+                    'arabic_text' => $arabicText,
+                    'transliteration' => null,
+                    'translation_english' => null,
+                    'translation_bengali' => null,
+                    'juz' => (int) data_get($item, 'juz_number') ?: null,
+                    'page' => (int) data_get($item, 'page_number') ?: null,
+                    'revelation_type' => $revelationMap[$surahNumber] ?? null,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+
+            if (!empty($rows)) {
+                foreach (array_chunk($rows, 500) as $chunk) {
+                    Verse::upsert(
+                        $chunk,
+                        ['surah_number', 'verse_number'],
+                        [
+                            'arabic_text',
+                            'transliteration',
+                            'translation_english',
+                            'translation_bengali',
+                            'juz',
+                            'page',
+                            'revelation_type',
+                            'updated_at',
+                        ]
+                    );
+                }
+
+                $imported += count($rows);
+            }
+
+            $totalPages = (int) data_get($payload, 'pagination.total_pages', 1);
+            $this->command?->info("Imported page {$page}/{$totalPages} (running total: {$imported})");
+
+            $page++;
+        } while ($page <= $totalPages && ($maxPages <= 0 || $page <= $maxPages));
+
+        $this->command?->info("Verse import complete. Total processed verses: {$imported}");
     }
 }

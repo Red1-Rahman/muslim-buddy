@@ -22,7 +22,7 @@ class PrayerLog extends Model
     ];
 
     protected $casts = [
-        'prayer_date' => 'date',
+        'prayer_date' => 'date:Y-m-d',
         'is_completed' => 'boolean',
         'completed_at' => 'datetime',
         'on_time' => 'boolean',

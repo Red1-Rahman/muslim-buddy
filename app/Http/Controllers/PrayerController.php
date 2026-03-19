@@ -39,8 +39,8 @@ class PrayerController extends Controller
         $date = new DateTime($request->input('date', 'now'), new \DateTimeZone($userTimezone));
         $prayerTimes = new PrayerTimes($coordinates, $date, $calculationParams);
 
-        // Get today's prayer logs
-        $today = $date->format('Y-m-d');
+        // Get today's prayer logs using plain date string for DB lookup
+        $prayerDate = now()->toDateString();
         $prayerLogs = [];
         $prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
@@ -48,7 +48,7 @@ class PrayerController extends Controller
             $log = PrayerLog::firstOrCreate(
                 [
                     'user_id' => $user->id,
-                    'prayer_date' => $today,
+                    'prayer_date' => $prayerDate,
                     'prayer_name' => $prayer,
                 ],
                 [
