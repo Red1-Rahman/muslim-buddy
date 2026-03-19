@@ -29,6 +29,14 @@ WORKDIR /var/www
 # Copy application files
 COPY . .
 
+# Create required directories and set permissions before composer
+RUN mkdir -p /var/www/bootstrap/cache \
+             /var/www/storage/logs \
+             /var/www/storage/framework/cache \
+             /var/www/storage/framework/sessions \
+             /var/www/storage/framework/views \
+    && chmod -R 775 /var/www/bootstrap/cache /var/www/storage
+
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
