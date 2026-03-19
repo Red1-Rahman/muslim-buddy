@@ -17,29 +17,18 @@ RUN apk add --no-cache \
 RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite pcntl bcmath gd xml
 
 # Install libsql PHP extension for Turso
-RUN LIBSQL_VERSION=$(curl -fsSL https://api.github.com/repos/tursodatabase/turso-client-php/releases/latest \
-        | grep '"tag_name"' | sed 's/.*"tag_name": "\(.*\)".*/\1/') \
-    && echo "LibSQL version: $LIBSQL_VERSION" \
-    && curl -fsSL "https://github.com/tursodatabase/turso-client-php/releases/download/${LIBSQL_VERSION}/turso-client-php_Linux_x86_64.tar.gz" \
-        -o /tmp/libsql.tar.gz \
+RUN curl -fsSL \
+    "https://github.com/tursodatabase/turso-client-php/releases/download/turso-php-extension-v1.6.2/turso-client-php_Linux_x86_64.tar.gz" \
+    -o /tmp/libsql.tar.gz \
     && mkdir -p /tmp/libsql \
     && tar -xzf /tmp/libsql.tar.gz -C /tmp/libsql \
-    && echo "Files extracted:" \
-    && ls -la /tmp/libsql/ \
+    && echo "Extracted files:" && ls -la /tmp/libsql/ \
     && EXT_DIR=$(php -r "echo ini_get('extension_dir');") \
-    && echo "PHP extension dir: $EXT_DIR" \
-    && find /tmp/libsql -name "*.so" | while read f; do \
-           echo "Copying $f to $EXT_DIR/"; \
-           cp "$f" "$EXT_DIR/"; \
-       done \
-    && ls "$EXT_DIR/" | grep libsql \
-    && SO_FILE=$(ls "$EXT_DIR/" | grep libsql | head -1) \
+    && find /tmp/libsql -name "*.so" -exec cp {} "$EXT_DIR/" \; \
+    && SO_FILE=$(ls "$EXT_DIR/" | grep -i libsql | head -1) \
     && echo "extension=$SO_FILE" > /usr/local/etc/php/conf.d/libsql.ini \
-    && echo "INI contents:" \
-    && cat /usr/local/etc/php/conf.d/libsql.ini \
     && rm -rf /tmp/libsql /tmp/libsql.tar.gz \
-    && php -r "echo 'LibSQL class exists: '; var_dump(class_exists('LibSQL'));" \
-    && php -m | grep -i libsql
+    && php -m | grep -i libsql && echo "libsql OK"
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
