@@ -1,22 +1,22 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm
 
 # Install system dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     curl \
     libpng-dev \
     libxml2-dev \
     zip \
     unzip \
     git \
-    sqlite \
-    sqlite-dev \
+    libsqlite3-dev \
     nginx \
-    supervisor
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite pcntl bcmath gd xml
 
-# Install libsql PHP extension for Turso
+# Install libsql PHP extension for Turso (requires GNU libc - Debian compatible)
 RUN curl -fsSL \
     "https://github.com/tursodatabase/turso-client-php/releases/download/turso-php-extension-v1.6.2/libsql_php-turso-php-extension-v1.6.2-php-8.2-nts-x86_64-unknown-linux-gnu.tar.gz" \
     -o /tmp/libsql.tar.gz \
