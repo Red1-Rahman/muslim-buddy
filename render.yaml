@@ -1,14 +1,9 @@
 services:
   - type: web
     name: muslim-buddy
-    env: php
+    env: docker
     plan: free
-    buildCommand: |
-      composer install --no-dev --optimize-autoloader
-      php artisan config:cache
-      php artisan route:cache
-      php artisan view:cache
-    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: APP_ENV
         value: production
@@ -17,7 +12,7 @@ services:
       - key: APP_KEY
         sync: false
       - key: DB_CONNECTION
-        value: turso
+        value: libsql
       - key: TURSO_DB_URL
         sync: false
       - key: TURSO_DB_TOKEN
