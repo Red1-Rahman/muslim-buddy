@@ -10,10 +10,10 @@ echo "TURSO_DB_URL=$TURSO_DB_URL"
 echo "TURSO_DB_TOKEN length=$(echo -n $TURSO_DB_TOKEN | wc -c)"
 echo "================="
 
-# Write env vars to .env file so Laravel can read them reliably
-echo "TURSO_DB_URL=${TURSO_DB_URL}" >> /var/www/.env
-echo "TURSO_DB_TOKEN=${TURSO_DB_TOKEN}" >> /var/www/.env
-echo "DB_CONNECTION=${DB_CONNECTION}" >> /var/www/.env
+# Write env vars to .env file so Laravel can read them reliably (replace existing values)
+sed -i "s|^TURSO_DB_URL=.*|TURSO_DB_URL=${TURSO_DB_URL}|" /var/www/.env
+sed -i "s|^TURSO_DB_TOKEN=.*|TURSO_DB_TOKEN=${TURSO_DB_TOKEN}|" /var/www/.env
+sed -i "s|^DB_CONNECTION=.*|DB_CONNECTION=${DB_CONNECTION}|" /var/www/.env
 
 # Clear any cached config so fresh values are used
 php artisan config:clear
