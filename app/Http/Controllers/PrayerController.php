@@ -45,17 +45,27 @@ class PrayerController extends Controller
         $prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
         foreach ($prayers as $prayer) {
-            $log = PrayerLog::firstOrCreate(
-                [
+            try {
+                $log = PrayerLog::firstOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'prayer_date' => $prayerDate,
+                        'prayer_name' => $prayer,
+                    ],
+                    [
+                        'is_completed' => false,
+                    ]
+                );
+                $prayerLogs[$prayer] = $log;
+            } catch (\Throwable $e) {
+                \Log::error('PrayerLog firstOrCreate failed', [
+                    'error' => $e->getMessage(),
                     'user_id' => $user->id,
+                    'prayer' => $prayer,
                     'prayer_date' => $prayerDate,
-                    'prayer_name' => $prayer,
-                ],
-                [
-                    'is_completed' => false,
-                ]
-            );
-            $prayerLogs[$prayer] = $log;
+                ]);
+                abort(500, 'Database error loading prayer logs: ' . $e->getMessage());
+            }
         }
 
         return view('prayers.index', compact('prayerTimes', 'prayerLogs', 'user', 'date'));
@@ -265,7 +275,7 @@ class PrayerController extends Controller
             'current_streak' => $user->prayer_streak ?? 0,
             'this_month' => PrayerLog::where('user_id', $user->id)
                 ->where('is_completed', true)
-                ->whereRaw("strftime('%m', prayer_date) = ?", [now()->format('m')])
+                ->whereBetween('prayer_date', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])
                 ->count(),
             'recent_prayers' => PrayerLog::where('user_id', $user->id)
                 ->where('is_completed', true)
@@ -275,14 +285,17 @@ class PrayerController extends Controller
                 ->get(),
         ];
 
-        // Get monthly prayer completion rate
+        // Get monthly prayer completion rate (PHP-side grouping to avoid LibSQL limitations)
         $monthlyData = PrayerLog::where('user_id', $user->id)
             ->where('is_completed', true)
-            ->whereRaw("strftime('%Y', prayer_date) = ?", [now()->format('Y')])
-            ->selectRaw("strftime('%m', prayer_date) as month, COUNT(*) as count")
-            ->groupByRaw("strftime('%m', prayer_date)")
+            ->whereBetween('prayer_date', [now()->startOfYear()->toDateString(), now()->endOfYear()->toDateString()])
             ->get()
-            ->pluck('count', 'month');
+            ->groupBy(function ($log) {
+                return date('n', strtotime($log->prayer_date));
+            })
+            ->map(function ($group) {
+                return $group->count();
+            });
 
         return view('prayers.statistics', compact('stats', 'monthlyData', 'user'));
     }

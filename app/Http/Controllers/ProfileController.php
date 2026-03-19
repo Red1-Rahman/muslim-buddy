@@ -207,7 +207,7 @@ class ProfileController extends Controller
             ->count();
 
         $monthlyPrayers = $user->prayerLogs()
-            ->whereRaw("strftime('%Y-%m', prayer_date) = ?", [now()->format('Y-m')])
+            ->whereBetween('prayer_date', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])
             ->where('is_completed', true)
             ->count();
 

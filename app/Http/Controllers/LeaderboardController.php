@@ -85,19 +85,22 @@ class LeaderboardController extends Controller
      */
     private function getPrayerLeaderboard($timeframe)
     {
+        $monthStart = now()->startOfMonth()->toDateString();
+        $monthEnd = now()->endOfMonth()->toDateString();
+        
         $query = User::withCount([
-            'prayerLogs as prayers_completed' => function ($query) use ($timeframe) {
+            'prayerLogs as prayers_completed' => function ($query) use ($timeframe, $monthStart, $monthEnd) {
                 $query->where('is_completed', true);
                 if ($timeframe === 'month') {
-                    $query->whereMonth('prayer_date', now()->month);
+                    $query->whereBetween('prayer_date', [$monthStart, $monthEnd]);
                 } elseif ($timeframe === 'week') {
                     $query->whereBetween('prayer_date', [now()->startOfWeek(), now()->endOfWeek()]);
                 }
             },
-            'prayerLogs as prayers_on_time' => function ($query) use ($timeframe) {
+            'prayerLogs as prayers_on_time' => function ($query) use ($timeframe, $monthStart, $monthEnd) {
                 $query->where('is_completed', true)->where('on_time', true);
                 if ($timeframe === 'month') {
-                    $query->whereMonth('prayer_date', now()->month);
+                    $query->whereBetween('prayer_date', [$monthStart, $monthEnd]);
                 } elseif ($timeframe === 'week') {
                     $query->whereBetween('prayer_date', [now()->startOfWeek(), now()->endOfWeek()]);
                 }
