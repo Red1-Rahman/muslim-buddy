@@ -32,16 +32,18 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'turso' => [
-         'driver'           => 'turso',
-         'url'              => env('TURSO_DB_URL'),
-         'authToken'        => env('TURSO_DB_TOKEN'),
-         'syncUrl'          => '',
-          'syncInterval'     => 5,
-         'read_your_writes' => true,
-         'encryptionKey'    => '',
-         'db_replica'       => null,
-],
+        'libsql' => [
+            'driver' => 'libsql',
+            'url' => env('TURSO_DB_URL'),
+            'authToken' => env('TURSO_DB_TOKEN'),
+            'syncUrl' => '',
+            'syncInterval' => 5,
+            'read_your_writes' => true,
+            'encryptionKey' => '',
+            'db_replica' => null,
+            'database' => ':memory:',
+            'prefix' => '',
+        ],
 
         'mysql' => [
             'driver' => 'mysql',
