@@ -129,10 +129,17 @@ class SurahSeeder extends Seeder
             ['surah_number' => 114, 'name_arabic' => 'الناس', 'name_english' => 'An-Nas', 'name_transliteration' => 'An-Nās', 'revelation_type' => 'Meccan', 'total_verses' => 6],
         ];
 
-        foreach ($surahs as $surah) {
-            Surah::updateOrCreate(
-                ['surah_number' => $surah['surah_number']], 
-                $surah
+        foreach (array_chunk($surahs, 50) as $chunk) {
+            Surah::upsert(
+                $chunk,
+                ['surah_number'],
+                [
+                    'name_arabic',
+                    'name_english',
+                    'name_transliteration',
+                    'revelation_type',
+                    'total_verses',
+                ]
             );
         }
     }
