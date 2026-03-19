@@ -49,6 +49,9 @@ RUN mkdir -p /var/www/bootstrap/cache \
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Patch the buggy Turso driver so it doesn't clear our libsql:// network URL
+RUN sed -i "s/\$config\['url'\] = \$this->checkPathOrFilename/\\/\/ \$config\['url'\] = \$this->checkPathOrFilename/" /var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLDatabase.php
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
