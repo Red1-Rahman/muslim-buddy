@@ -18,17 +18,16 @@ RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite pcntl bcmath gd xml
 
 # Install libsql PHP extension for Turso
 RUN curl -fsSL \
-    "https://github.com/tursodatabase/turso-client-php/releases/download/turso-php-extension-v1.6.2/turso-client-php_Linux_x86_64.tar.gz" \
+    "https://github.com/tursodatabase/turso-client-php/releases/download/turso-php-extension-v1.6.2/libsql_php-turso-php-extension-v1.6.2-php-8.2-nts-x86_64-unknown-linux-gnu.tar.gz" \
     -o /tmp/libsql.tar.gz \
     && mkdir -p /tmp/libsql \
     && tar -xzf /tmp/libsql.tar.gz -C /tmp/libsql \
-    && echo "Extracted files:" && ls -la /tmp/libsql/ \
     && EXT_DIR=$(php -r "echo ini_get('extension_dir');") \
     && find /tmp/libsql -name "*.so" -exec cp {} "$EXT_DIR/" \; \
     && SO_FILE=$(ls "$EXT_DIR/" | grep -i libsql | head -1) \
     && echo "extension=$SO_FILE" > /usr/local/etc/php/conf.d/libsql.ini \
     && rm -rf /tmp/libsql /tmp/libsql.tar.gz \
-    && php -m | grep -i libsql && echo "libsql OK"
+    && php -m | grep -i libsql && echo "libsql extension loaded successfully"
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
