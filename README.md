@@ -41,7 +41,7 @@ Muslim Buddy helps Muslims maintain consistency in their daily worship by combin
 - Read and memorized tracking per hadith
 
 ### Gamification
-<img width="615" height="82" alt="image" src="https://github.com/user-attachments/assets/0bc64b44-30f1-4fd7-b4de-497e22631c29" />
+![ScreencastFrom2026-03-1913-29-50-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/c2f4ba88-ee2a-4acc-97a4-9597331fb7e5)
 <img width="875" height="257" alt="image" src="https://github.com/user-attachments/assets/1c05fc79-1223-43c9-a0f0-7c685ac4ec2c" />
 <img width="1674" height="785" alt="image" src="https://github.com/user-attachments/assets/4b2dbfaf-0370-4200-b0c3-d21aecb3141f" />
 
