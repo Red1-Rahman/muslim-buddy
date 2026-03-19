@@ -94,13 +94,15 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
     try {
         $hasGoogleIdColumn = Schema::hasColumn('users', 'google_id');
 
-        $userQuery = User::where('email', $googleUser->getEmail());
+        $user = User::where('email', $googleUser->getEmail())
+            ->get()
+            ->first();
 
-        if ($hasGoogleIdColumn) {
-            $userQuery->orWhere('google_id', $googleUser->getId());
+        if (!$user && $hasGoogleIdColumn) {
+            $user = User::where('google_id', $googleUser->getId())
+                ->get()
+                ->first();
         }
-
-        $user = $userQuery->first();
 
         if (!$user) {
             $createData = [
