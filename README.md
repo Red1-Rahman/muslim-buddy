@@ -8,29 +8,44 @@ A Laravel web application for tracking personal Islamic practice — prayers, Qu
 
 Muslim Buddy helps Muslims maintain consistency in their daily worship by combining structured tracking with spaced-repetition memorization and community leaderboards. Prayer times are calculated locally using astronomical formulas; no third-party API is required for that core functionality.
 
+<img width="1920" height="1068" alt="screencapture-127-0-0-1-8080-2026-03-19-12_47_15" src="https://github.com/user-attachments/assets/0ee37c5c-2598-4ca8-912d-92e52f99d4aa" />
+
 ---
 
 ## Features
 
 ### Prayer Tracking
+
+<img width="1920" height="1259" alt="screencapture-127-0-0-1-8080-prayers-2026-03-19-12_49_50" src="https://github.com/user-attachments/assets/1c7350ca-11c8-4352-84b0-a19ad9171199" />
+
 - Prayer times calculated from GPS coordinates using the Meeus astronomical algorithm
 - Supports multiple calculation methods (Muslim World League, Egyptian, Karachi, Dubai, etc.) and both Shafi and Hanafi madhabs
 - Log each prayer with quality flags: on-time, congregation, mosque
 - Streak tracking and points awards (10–30 pts per prayer)
 
 ### Quran
+<img width="1707" height="903" alt="image" src="https://github.com/user-attachments/assets/2f0c62fb-e02c-448f-aaf0-175a851c44d3" />
+...
+<img width="1708" height="907" alt="image" src="https://github.com/user-attachments/assets/10fd2769-1d66-40a4-b75a-b468dec38185" />
+
+
 - Full Quran — 114 surahs, 6,236 verses — sourced via the [Quran Foundation API](https://api.quran.com/api/v4)
 - Arabic text (Uthmani script) stored locally after seeding; no runtime API dependency
 - Per-verse progress states: Read (1 pt), Understood (2 pts), Memorized (5 pts)
 - Spaced-repetition review scheduler with Easy / Medium / Hard difficulty
 - Search across Arabic text, English translation, and transliteration
 
-### Hadith
+### Hadith (Under Dev)
 - Authentic collections: Sahih al-Bukhari, Sahih Muslim, and others
 - Arabic text, English translation, Isnad (chain of narrators), and grade (Sahih / Hasan / Daif)
 - Read and memorized tracking per hadith
 
 ### Gamification
+<img width="615" height="82" alt="image" src="https://github.com/user-attachments/assets/0bc64b44-30f1-4fd7-b4de-497e22631c29" />
+<img width="875" height="257" alt="image" src="https://github.com/user-attachments/assets/1c05fc79-1223-43c9-a0f0-7c685ac4ec2c" />
+<img width="1674" height="785" alt="image" src="https://github.com/user-attachments/assets/4b2dbfaf-0370-4200-b0c3-d21aecb3141f" />
+
+
 - Unified points system across all practice categories
 - Leaderboards: overall, Quran progress, prayer completion, streaks (all-time / monthly / weekly)
 - Daily goals with visual progress indicators
