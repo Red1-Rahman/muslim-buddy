@@ -19,6 +19,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'email_verified_at',
         'google_id',
         'password',
         'latitude',
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'madhab',
         'timezone',
         'bio',
+        'avatar',
         'avatar',
         'total_points',
         'prayer_streak',

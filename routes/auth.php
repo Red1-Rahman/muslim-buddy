@@ -92,16 +92,19 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
     }
 
     try {
-        $hasGoogleIdColumn = Schema::hasColumn('users', 'google_id');
-
         $user = User::where('email', $googleUser->getEmail())
             ->get()
             ->first();
 
-        if (!$user && $hasGoogleIdColumn) {
-            $user = User::where('google_id', $googleUser->getId())
-                ->get()
-                ->first();
+        if (!$user) {
+            try {
+                $user = User::where('google_id', $googleUser->getId())
+                    ->get()
+                    ->first();
+            } catch (\Throwable $e) {
+                // In case the column doesn't exist yet, we just swallow it
+                $user = null;
+            }
         }
 
         if (!$user) {
@@ -111,17 +114,14 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
                 'email_verified_at' => now(),
                 'avatar' => $googleUser->getAvatar(),
                 'password' => Hash::make(Str::random(40)),
+                'google_id' => $googleUser->getId(),
             ];
-
-            if ($hasGoogleIdColumn) {
-                $createData['google_id'] = $googleUser->getId();
-            }
 
             $user = User::create($createData);
         } else {
             $updates = [];
 
-            if ($hasGoogleIdColumn && empty($user->google_id)) {
+            if (empty($user->google_id)) {
                 $updates['google_id'] = $googleUser->getId();
             }
 
@@ -149,7 +149,7 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
         ]);
 
         return redirect()->route('login')->withErrors([
-            'email' => 'Google sign-in failed due to a server issue. Please try again shortly.',
+            'email' => 'Server Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
         ]);
     }
 })->middleware('guest')->name('auth.google.callback');
