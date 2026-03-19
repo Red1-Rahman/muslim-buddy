@@ -92,15 +92,13 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
     }
 
     try {
-        $user = User::whereRaw('email = :email', ['email' => $googleUser->getEmail()])
-            ->get()
-            ->first();
+        $safeEmail = str_replace("'", "''", $googleUser->getEmail());
+        $user = User::whereRaw("email = '$safeEmail'")->first();
 
         if (!$user) {
             try {
-                $user = User::whereRaw('google_id = :google_id', ['google_id' => $googleUser->getId()])
-                    ->get()
-                    ->first();
+                $safeId = str_replace("'", "''", (string)$googleUser->getId());
+                $user = User::whereRaw("google_id = '$safeId'")->first();
             } catch (\Throwable $e) {
                 // In case the column doesn't exist yet, we just swallow it
                 $user = null;
