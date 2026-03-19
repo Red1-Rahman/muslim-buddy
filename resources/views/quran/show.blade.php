@@ -29,6 +29,15 @@
                 </div>
             </div>
 
+            @if($audioUrl)
+            <div class="audio-player my-4">
+                <audio controls preload="none" class="w-full">
+                    <source src="{{ $audioUrl }}" type="audio/mpeg">
+                </audio>
+                <p class="text-sm text-gray-500 mt-1">Recitation: Mishari Rashid al-Afasy</p>
+            </div>
+            @endif
+
             <!-- Bismillah (except for At-Tawbah) -->
             @if($surah->surah_number != 9)
             <div class="text-center mb-8">

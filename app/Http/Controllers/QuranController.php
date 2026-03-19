@@ -8,6 +8,7 @@ use App\Models\UserVerseProgress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class QuranController extends Controller
 {
@@ -48,6 +49,22 @@ class QuranController extends Controller
         $verses = Verse::where('surah_number', $surahNumber)
             ->orderBy('verse_number')
             ->get();
+        $audioUrl = null;
+
+        try {
+            $recitationId = (int) config('services.quran.recitation_id', 7);
+            $apiBase = rtrim((string) config('services.quran.api_base', 'https://api.quran.com/api/v4'), '/');
+
+            $response = Http::timeout(5)
+                ->retry(2, 200)
+                ->get("{$apiBase}/chapter_recitations/{$recitationId}/{$surahNumber}");
+
+            if ($response->successful()) {
+                $audioUrl = data_get($response->json(), 'audio_file.audio_url');
+            }
+        } catch (\Exception $e) {
+            // non-fatal, audio player just won't show
+        }
 
         // Load user progress for these verses
         $progressMap = UserVerseProgress::where('user_id', $user->id)
@@ -59,7 +76,7 @@ class QuranController extends Controller
             $verse->user_progress = $progressMap->get($verse->id);
         }
 
-        return view('quran.show', compact('surah', 'verses', 'user'));
+        return view('quran.show', compact('surah', 'verses', 'user', 'audioUrl'));
     }
 
     /**
