@@ -31,6 +31,8 @@ services:
         value: 7
       - key: SESSION_DRIVER
         value: file
+      - key: SESSION_SECURE_COOKIE
+        value: true
       - key: CACHE_DRIVER
         value: file
       - key: QUEUE_CONNECTION
