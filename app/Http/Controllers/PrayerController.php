@@ -265,7 +265,7 @@ class PrayerController extends Controller
             'current_streak' => $user->prayer_streak ?? 0,
             'this_month' => PrayerLog::where('user_id', $user->id)
                 ->where('is_completed', true)
-                ->whereMonth('prayer_date', now()->month)
+                ->whereRaw("strftime('%m', prayer_date) = ?", [now()->format('m')])
                 ->count(),
             'recent_prayers' => PrayerLog::where('user_id', $user->id)
                 ->where('is_completed', true)
@@ -278,9 +278,9 @@ class PrayerController extends Controller
         // Get monthly prayer completion rate
         $monthlyData = PrayerLog::where('user_id', $user->id)
             ->where('is_completed', true)
-            ->whereYear('prayer_date', now()->year)
-            ->selectRaw('MONTH(prayer_date) as month, COUNT(*) as count')
-            ->groupBy('month')
+            ->whereRaw("strftime('%Y', prayer_date) = ?", [now()->format('Y')])
+            ->selectRaw("strftime('%m', prayer_date) as month, COUNT(*) as count")
+            ->groupByRaw("strftime('%m', prayer_date)")
             ->get()
             ->pluck('count', 'month');
 
