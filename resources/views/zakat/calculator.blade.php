@@ -18,12 +18,6 @@
             </div>
         </div>
 
-        <div class="mt-4 text-sm text-gray-600">
-            Live Nisab data source:
-            <a href="https://nisab.tahababa.com" target="_blank" rel="noopener noreferrer" class="text-emerald-700 font-medium hover:text-emerald-900 underline">
-                nisab.tahababa.com
-            </a>
-        </div>
     </div>
 
     @if(!$nisabData)
@@ -55,7 +49,7 @@
                 </div>
             </div>
             <p class="text-xs mt-3 text-emerald-800">Timestamp: {{ $timestamp }}</p>
-            <p class="text-xs mt-1 text-emerald-800">Values updated 6× daily. Source: <a href="https://nisab.tahababa.com" target="_blank" rel="noopener noreferrer" class="underline font-medium">nisab.tahababa.com</a></p>
+            <p class="text-xs mt-1 text-emerald-800">Values updated 6× daily.</p>
             <p class="text-xs mt-1 text-emerald-800">Islam permits using either gold or silver nisab. Many scholars recommend silver as it is lower and more inclusive.</p>
         </div>
     @endif
@@ -68,11 +62,17 @@
                 <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
                 <select id="currency" class="w-full rounded-lg border-gray-300 focus:ring-emerald-500 focus:border-emerald-500">
                     <option value="USD">USD</option>
-                    <option value="GBP">GBP</option>
-                    <option value="EUR">EUR</option>
-                    <option value="BDT">BDT</option>
-                    <option value="MYR">MYR</option>
-                    <option value="SAR">SAR</option>
+                    <option value="BDT">🇧🇩 BDT (Bangladeshi Taka)</option>
+                    <option value="IDR">🇮🇩 IDR (Indonesia)</option>
+                    <option value="PKR">🇵🇰 PKR (Pakistan)</option>
+                    <option value="INR">🇮🇳 INR (India)</option>
+                    <option value="NGN">🇳🇬 NGN (Nigeria)</option>
+                    <option value="EGP">🇪🇬 EGP (Egypt)</option>
+                    <option value="TRY">🇹🇷 TRY (Turkey)</option>
+                    <option value="IRR">🇮🇷 IRR (Iran)</option>
+                    <option value="DZD">🇩🇿 DZD (Algeria)</option>
+                    <option value="MAD">🇲🇦 MAD (Morocco)</option>
+                    <option value="SAR">🇸🇦 SAR (Saudi Riyal)</option>
                 </select>
             </div>
 
@@ -137,13 +137,18 @@
                 @csrf
                 <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800 shadow-sm">Record that I have paid Zakat this year</button>
             </form>
-            <p class="text-xs text-gray-500 mt-2">This is a personal reminder only. It does not verify payment or notify anyone.</p>
+            <p class="text-xs text-red-600 mt-2">This is a personal reminder only. It does not verify payment or notify anyone.</p>
         @endif
     </div>
 
     <div class="bg-white rounded-xl border border-gray-200 p-4 text-xs text-gray-600 mb-10">
         <p>Zakat calculations shown are estimates for guidance only. Scholars may differ on certain asset types and thresholds. Always consult a qualified Islamic scholar for your personal obligation.</p>
-        <p class="mt-2">Nisab data acknowledgment: <a href="https://nisab.tahababa.com" target="_blank" rel="noopener noreferrer" class="text-emerald-700 underline font-medium">nisab.tahababa.com</a></p>
+        <p class="mt-2">
+            Data acknowledgments:
+            <a href="https://nisab.tahababa.com" target="_blank" rel="noopener noreferrer" class="text-emerald-700 underline font-medium">nisab.tahababa.com</a>
+            and
+            <a href="https://github.com/fawazahmed0/currency-api" target="_blank" rel="noopener noreferrer" class="text-emerald-700 underline font-medium">fawazahmed0/currency-api</a>.
+        </p>
     </div>
 </div>
 </div>
@@ -159,6 +164,7 @@
     const nisabData = @json($nisabData);
     const goldValues = @json($goldValues);
     const silverValues = @json($silverValues);
+    const fxRates = @json($fxRates);
 
     const currencyEl = document.getElementById('currency');
     const fields = ['cash', 'gold_grams', 'silver_grams', 'inventory', 'receivables', 'debts']
@@ -176,6 +182,18 @@
 
     function formatAmount(value, currency) {
         return `${currency} ${Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+    }
+
+    function getUsdToCurrencyRate(currency) {
+        if (currency === 'USD') {
+            return 1;
+        }
+
+        const map = fxRates || {};
+        const key = String(currency || '').toLowerCase();
+        const rate = Number(map[key]);
+
+        return Number.isFinite(rate) && rate > 0 ? rate : null;
     }
 
     function calculate() {
@@ -201,32 +219,49 @@
         const goldNisabUsd = Number(goldValues?.USD ?? 0);
         const silverNisabUsd = Number(silverValues?.USD ?? 0);
 
-        let exchangeRate = 1;
-        let hasCurrencyNisab = goldNisabCurrency > 0 && silverNisabCurrency > 0;
+        const usdToCurrency = getUsdToCurrencyRate(currency);
+        const hasCurrencyNisab = goldNisabCurrency > 0 && silverNisabCurrency > 0;
+        const canConvert = usdToCurrency !== null;
 
-        if (currency !== 'USD' && hasCurrencyNisab && goldNisabUsd > 0) {
-            exchangeRate = goldNisabCurrency / goldNisabUsd;
+        let cashUsd = cash;
+        let inventoryUsd = inventory;
+        let receivablesUsd = receivables;
+        let debtsUsd = debts;
+
+        if (currency !== 'USD' && canConvert) {
+            cashUsd = cash / usdToCurrency;
+            inventoryUsd = inventory / usdToCurrency;
+            receivablesUsd = receivables / usdToCurrency;
+            debtsUsd = debts / usdToCurrency;
         }
 
-        let displayTotal = totalUsd;
+        const adjustedTotalUsd = cashUsd + goldValueUsd + silverValueUsd + inventoryUsd + receivablesUsd - debtsUsd;
+
+        let displayCurrency = 'USD';
+        let displayTotal = adjustedTotalUsd;
         let displayGoldNisab = goldNisabUsd;
         let displaySilverNisab = silverNisabUsd;
 
-        if (currency !== 'USD' && hasCurrencyNisab) {
-            displayTotal = totalUsd * exchangeRate;
-            displayGoldNisab = goldNisabCurrency;
-            displaySilverNisab = silverNisabCurrency;
+        if (currency === 'USD') {
+            displayCurrency = 'USD';
             currencyNote.textContent = '';
-        } else if (currency === 'BDT' || currency === 'SAR') {
-            currencyNote.textContent = 'BDT and SAR thresholds are shown in USD only. Convert using today\'s exchange rate.';
+        } else if (canConvert) {
+            displayCurrency = currency;
+            displayTotal = adjustedTotalUsd * usdToCurrency;
+            displayGoldNisab = hasCurrencyNisab ? goldNisabCurrency : (goldNisabUsd * usdToCurrency);
+            displaySilverNisab = hasCurrencyNisab ? silverNisabCurrency : (silverNisabUsd * usdToCurrency);
+            currencyNote.textContent = hasCurrencyNisab
+                ? ''
+                : 'Nisab thresholds for this currency were converted from USD using live exchange rates.';
         } else {
-            currencyNote.textContent = '';
+            displayCurrency = 'USD';
+            currencyNote.textContent = 'Exchange rate unavailable for this currency right now, so values are shown in USD.';
         }
 
         const nisabThreshold = Math.min(displayGoldNisab || Number.MAX_VALUE, displaySilverNisab || Number.MAX_VALUE);
 
-        nisabDisplay.textContent = `Gold Nisab: ${formatAmount(displayGoldNisab, currency === 'USD' || hasCurrencyNisab ? currency : 'USD')} | Silver Nisab: ${formatAmount(displaySilverNisab, currency === 'USD' || hasCurrencyNisab ? currency : 'USD')} | Applied (lower): ${formatAmount(nisabThreshold, currency === 'USD' || hasCurrencyNisab ? currency : 'USD')}`;
-        wealthDisplay.textContent = `Total zakatable wealth: ${formatAmount(displayTotal, currency === 'USD' || hasCurrencyNisab ? currency : 'USD')}`;
+        nisabDisplay.textContent = `Gold Nisab: ${formatAmount(displayGoldNisab, displayCurrency)} | Silver Nisab: ${formatAmount(displaySilverNisab, displayCurrency)} | Applied (lower): ${formatAmount(nisabThreshold, displayCurrency)}`;
+        wealthDisplay.textContent = `Total zakatable wealth: ${formatAmount(displayTotal, displayCurrency)}`;
 
         if (!Number.isFinite(nisabThreshold) || nisabThreshold <= 0) {
             resultBox.className = 'rounded-md p-3 text-sm bg-amber-50 text-amber-900 border border-amber-200';
@@ -237,7 +272,7 @@
         if (displayTotal >= nisabThreshold) {
             const zakatDue = displayTotal * 0.025;
             resultBox.className = 'rounded-md p-3 text-sm bg-emerald-50 text-emerald-900 border border-emerald-200';
-            resultBox.innerHTML = `Your Zakat due is approximately <strong>${formatAmount(zakatDue, currency === 'USD' || hasCurrencyNisab ? currency : 'USD')}</strong>.<br>This is 2.5% of your total zakatable wealth.`;
+            resultBox.innerHTML = `Your Zakat due is approximately <strong>${formatAmount(zakatDue, displayCurrency)}</strong>.<br>This is 2.5% of your total zakatable wealth.`;
         } else {
             resultBox.className = 'rounded-md p-3 text-sm bg-gray-100 text-gray-800 border border-gray-200';
             resultBox.textContent = 'Your wealth is below the Nisab threshold. Zakat is not obligatory this year.';

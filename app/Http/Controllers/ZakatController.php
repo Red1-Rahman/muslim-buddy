@@ -15,6 +15,7 @@ class ZakatController extends Controller
     {
         $user = Auth::user();
         $nisabData = null;
+        $fxRates = null;
 
         try {
             $response = Http::timeout(8)
@@ -26,6 +27,18 @@ class ZakatController extends Controller
             }
         } catch (\Throwable $e) {
             $nisabData = null;
+        }
+
+        try {
+            $fxResponse = Http::timeout(8)
+                ->retry(2, 500)
+                ->get('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+
+            if ($fxResponse->successful()) {
+                $fxRates = data_get($fxResponse->json(), 'usd');
+            }
+        } catch (\Throwable $e) {
+            $fxRates = null;
         }
 
         $rawMadhab = strtolower((string) ($user->madhab ?? $user->calculation_method ?? 'hanafi'));
@@ -40,7 +53,7 @@ class ZakatController extends Controller
 
         $userMadhab = $map[$rawMadhab] ?? 'hanafi';
 
-        return view('zakat.calculator', compact('nisabData', 'userMadhab', 'user'));
+        return view('zakat.calculator', compact('nisabData', 'userMadhab', 'user', 'fxRates'));
     }
 
     /**
