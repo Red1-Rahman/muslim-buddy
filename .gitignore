@@ -1,6 +1,7 @@
 # Laravel Framework
 /bootstrap/compiled.php
 /bootstrap/cache
+bootstrap/cache/*.php
 /app/storage/
 /vendor/
 /storage/*.key
@@ -68,6 +69,7 @@ pids
 coverage/
 
 # Database
+database/database.sqlite
 *.sqlite
 *.sqlite3
 
