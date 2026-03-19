@@ -11,56 +11,56 @@
     </div>
 
     <!-- Stats Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Total Points -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                    <i class="fas fa-coins text-white text-2xl"></i>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Today</h3>
+                    <p id="today-prayer-stat" class="text-3xl font-bold text-blue-600">{{ $todayCompletedPrayers }}/5</p>
+                    <p class="text-sm text-gray-500">prayers completed</p>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Points</p>
-                    <p class="text-2xl font-semibold text-gray-900">{{ number_format($user->total_points) }}</p>
-                </div>
+                <div class="text-4xl">🕌</div>
             </div>
         </div>
 
-        <!-- Prayer Streak -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-orange-500 rounded-md p-3">
-                    <i class="fas fa-fire text-white text-2xl"></i>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">This Week</h3>
+                    <p
+                        id="week-prayer-stat"
+                        class="text-3xl font-bold text-green-600"
+                        data-base-week="{{ max(0, $weeklyPrayers - $todayCompletedPrayers) }}"
+                    >{{ $weeklyPrayers }}</p>
+                    <p class="text-sm text-gray-500">total prayers</p>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Prayer Streak</p>
-                    <p class="text-2xl font-semibold text-gray-900">{{ $user->prayer_streak }} days</p>
-                </div>
+                <div class="text-4xl">📅</div>
             </div>
         </div>
 
-        <!-- Weekly Prayers -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                    <i class="fas fa-prayer-hands text-white text-2xl"></i>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">This Month</h3>
+                    <p
+                        id="month-prayer-stat"
+                        class="text-3xl font-bold text-purple-600"
+                        data-base-month="{{ max(0, $monthlyPrayers - $todayCompletedPrayers) }}"
+                    >{{ $monthlyPrayers }}</p>
+                    <p class="text-sm text-gray-500">total prayers</p>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">This Week</p>
-                    <p class="text-2xl font-semibold text-gray-900">{{ $weeklyPrayers }}/35</p>
-                </div>
+                <div class="text-4xl">📊</div>
             </div>
         </div>
 
-        <!-- Weekly Verses -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                    <i class="fas fa-book-quran text-white text-2xl"></i>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Current Streak</h3>
+                    <p id="streak-prayer-stat" class="text-3xl font-bold text-orange-600">{{ $currentStreak }}</p>
+                    <p class="text-sm text-gray-500">days</p>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Verses Read</p>
-                    <p class="text-2xl font-semibold text-gray-900">{{ $weeklyVerses }}</p>
-                </div>
+                <div class="text-4xl">🔥</div>
             </div>
         </div>
     </div>
@@ -428,27 +428,31 @@ function updateProgress() {
 }
 
 function updateQuickStats() {
-    // Update the prayer count in quick stats if it exists
     const prayerItems = document.querySelectorAll('.space-y-3 > div');
     let completed = 0;
-    
+
     prayerItems.forEach(item => {
         if (item.classList.contains('flex') && item.classList.contains('bg-green-50')) {
             completed++;
         }
     });
-    
-    // Find and update the "Today's Prayers" stat if present
-    const statCards = document.querySelectorAll('.bg-white.rounded-lg.shadow');
-    statCards.forEach(card => {
-        const label = card.querySelector('.text-gray-600');
-        if (label && label.textContent.includes("Today's Prayers")) {
-            const valueElement = card.querySelector('.text-2xl.font-bold');
-            if (valueElement) {
-                valueElement.textContent = `${completed}/5`;
-            }
-        }
-    });
+
+    const todayStat = document.getElementById('today-prayer-stat');
+    if (todayStat) {
+        todayStat.textContent = `${completed}/5`;
+    }
+
+    const weekStat = document.getElementById('week-prayer-stat');
+    if (weekStat) {
+        const weekBase = parseInt(weekStat.dataset.baseWeek || '0', 10) || 0;
+        weekStat.textContent = String(weekBase + completed);
+    }
+
+    const monthStat = document.getElementById('month-prayer-stat');
+    if (monthStat) {
+        const monthBase = parseInt(monthStat.dataset.baseMonth || '0', 10) || 0;
+        monthStat.textContent = String(monthBase + completed);
+    }
 }
 
 // Listen for storage changes from other tabs (prayers page)
@@ -556,6 +560,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error loading stored update:', error);
         }
     }
+
+    updateQuickStats();
 });
 </script>
 @endpush

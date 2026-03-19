@@ -201,6 +201,18 @@ class ProfileController extends Controller
             ->where('is_completed', true)
             ->count();
 
+        $todayCompletedPrayers = $user->prayerLogs()
+            ->where('prayer_date', now()->toDateString())
+            ->where('is_completed', true)
+            ->count();
+
+        $monthlyPrayers = $user->prayerLogs()
+            ->whereRaw("strftime('%Y-%m', prayer_date) = ?", [now()->format('Y-m')])
+            ->where('is_completed', true)
+            ->count();
+
+        $currentStreak = $user->prayer_streak ?? 0;
+
         $weeklyVerses = $user->verseProgress()
             ->whereBetween('read_at', [now()->startOfWeek(), now()->endOfWeek()])
             ->where('is_read', true)
@@ -212,6 +224,16 @@ class ProfileController extends Controller
             ->where('next_review_at', '<=', now())
             ->count();
 
-        return view('dashboard', compact('user', 'todayPrayers', 'todayGoal', 'weeklyPrayers', 'weeklyVerses', 'dueReviews'));
+        return view('dashboard', compact(
+            'user',
+            'todayPrayers',
+            'todayGoal',
+            'weeklyPrayers',
+            'weeklyVerses',
+            'dueReviews',
+            'todayCompletedPrayers',
+            'monthlyPrayers',
+            'currentStreak'
+        ));
     }
 }
