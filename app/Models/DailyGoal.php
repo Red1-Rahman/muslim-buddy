@@ -18,7 +18,7 @@ class DailyGoal extends Model
     ];
 
     protected $casts = [
-        'goal_date' => 'date',
+        'goal_date' => 'date:Y-m-d',
         'target_verses' => 'integer',
         'verses_completed' => 'integer',
         'all_prayers_completed' => 'boolean',

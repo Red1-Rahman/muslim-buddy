@@ -30,10 +30,11 @@ class ProfileController extends Controller
         ];
 
         // Get today's goal
+        $goalDate = now()->toDateString();
         $todayGoal = DailyGoal::firstOrCreate(
             [
                 'user_id' => $user->id,
-                'goal_date' => now()->toDateString(),
+                'goal_date' => $goalDate,
             ],
             [
                 'target_verses' => 5,
@@ -159,10 +160,12 @@ class ProfileController extends Controller
             'target_verses' => 'required|integer|min:1|max:100',
         ]);
 
+        $goalDate = now()->toDateString();
+
         $goal = DailyGoal::updateOrCreate(
             [
                 'user_id' => Auth::id(),
-                'goal_date' => now()->toDateString(),
+                'goal_date' => $goalDate,
             ],
             $validated
         );
@@ -179,10 +182,11 @@ class ProfileController extends Controller
 
         // Get today's stats
         $todayPrayers = $user->today_prayer_status;
+        $goalDate = now()->toDateString();
         $todayGoal = DailyGoal::firstOrCreate(
             [
                 'user_id' => $user->id,
-                'goal_date' => now()->toDateString(),
+                'goal_date' => $goalDate,
             ],
             [
                 'target_verses' => 5,
