@@ -21,6 +21,7 @@ class VerseSeeder extends Seeder
         $maxPages = (int) env('QURAN_API_MAX_PAGES', 0);
         $translationResourceId = (int) env('QURAN_API_TRANSLATION_RESOURCE_ID', 85);
         $translationPerPage = max(1, min((int) env('QURAN_API_TRANSLATION_PER_PAGE', 50), 50));
+        $fetchTransliteration = filter_var(env('QURAN_API_FETCH_TRANSLITERATION', true), FILTER_VALIDATE_BOOL);
 
         $clientId = env('QURAN_API_CLIENT_ID');
         $authToken = env('QURAN_API_AUTH_TOKEN');
@@ -154,6 +155,138 @@ class VerseSeeder extends Seeder
         );
 
         $this->command?->info("English translation sync complete. Total verses updated: {$translationUpdated}");
+
+        if (!$fetchTransliteration) {
+            $this->command?->warn('Skipping transliteration sync (QURAN_API_FETCH_TRANSLITERATION=false).');
+            return;
+        }
+
+        $transliterationUpdated = $this->importVerseTransliterations();
+        $this->command?->info("Transliteration sync complete. Total verses updated: {$transliterationUpdated}");
+    }
+
+    private function importVerseTransliterations(): int
+    {
+        $this->command?->info('Importing verse transliterations (word-by-word)...');
+
+        $updated = 0;
+
+        for ($chapter = 1; $chapter <= 114; $chapter++) {
+            $page = 1;
+
+            while (true) {
+                try {
+                    $response = Http::acceptJson()
+                        ->retry(2, 300)
+                        ->timeout(30)
+                        ->get("https://api.quran.com/api/v4/verses/by_chapter/{$chapter}", [
+                            'words' => 'true',
+                            'word_fields' => 'transliteration',
+                            'per_page' => 50,
+                            'page' => $page,
+                        ]);
+                } catch (\Throwable $e) {
+                    $this->command?->warn("Transliteration fetch failed for chapter {$chapter}, page {$page}: {$e->getMessage()}");
+                    break;
+                }
+
+                if (!$response->successful()) {
+                    $this->command?->warn("Transliteration request failed for chapter {$chapter}, page {$page} (HTTP {$response->status()}).");
+                    break;
+                }
+
+                $payload = $response->json();
+                $verses = data_get($payload, 'verses', []);
+
+                if (!is_array($verses) || empty($verses)) {
+                    break;
+                }
+
+                foreach ($verses as $verse) {
+                    $verseKey = (string) data_get($verse, 'verse_key', '');
+
+                    if ($verseKey === '' || !str_contains($verseKey, ':')) {
+                        continue;
+                    }
+
+                    [$chapterPart, $versePart] = array_pad(explode(':', $verseKey, 2), 2, null);
+                    $chapterId = (int) $chapterPart;
+                    $verseNum = (int) $versePart;
+
+                    if ($chapterId < 1 || $verseNum < 1) {
+                        continue;
+                    }
+
+                    $words = data_get($verse, 'words', []);
+
+                    if (!is_array($words) || empty($words)) {
+                        continue;
+                    }
+
+                    $wordTransliterations = [];
+
+                    foreach ($words as $word) {
+                        $wordText = $this->extractWordTransliteration($word);
+
+                        if ($wordText !== '') {
+                            $wordTransliterations[] = $wordText;
+                        }
+                    }
+
+                    $transliterationText = trim(preg_replace('/\s+/', ' ', implode(' ', $wordTransliterations)));
+
+                    if ($transliterationText === '') {
+                        continue;
+                    }
+
+                    $affected = Verse::where('surah_number', $chapterId)
+                        ->where('verse_number', $verseNum)
+                        ->update([
+                            'transliteration' => $transliterationText,
+                            'updated_at' => Carbon::now(),
+                        ]);
+
+                    $updated += $affected;
+                }
+
+                $nextPage = data_get($payload, 'pagination.next_page');
+
+                if (empty($nextPage)) {
+                    break;
+                }
+
+                $page = (int) $nextPage;
+            }
+
+            $this->command?->info("Transliterations synced for chapter {$chapter}/114");
+        }
+
+        return $updated;
+    }
+
+    private function extractWordTransliteration(array $word): string
+    {
+        $transliteration = data_get($word, 'transliteration');
+
+        if (is_string($transliteration)) {
+            return trim($transliteration);
+        }
+
+        if (is_array($transliteration)) {
+            $text = data_get($transliteration, 'text');
+
+            if (is_string($text)) {
+                return trim($text);
+            }
+
+            foreach ($transliteration as $value) {
+                if (is_string($value) && trim($value) !== '') {
+                    return trim($value);
+                }
+            }
+        }
+
+        return '';
     }
 
     private function importEnglishTranslations(
