@@ -116,24 +116,33 @@ class HadithController extends Controller
             return response()->json(['error' => 'Authentication required'], 401);
         }
 
-        $progress = UserHadithProgress::updateOrCreate(
-            [
-                'user_id' => auth()->id(),
-                'hadith_id' => $hadith->id
-            ],
-            [
-                'status' => $request->status,
-                'notes' => $request->notes,
-                'read_at' => in_array($request->status, ['read', 'memorized']) ? now() : null,
-                'memorized_at' => $request->status === 'memorized' ? now() : null
-            ]
-        );
+        try {
+            $progress = UserHadithProgress::updateOrCreate(
+                [
+                    'user_id' => auth()->id(),
+                    'hadith_id' => $hadith->id
+                ],
+                [
+                    'status' => $request->status,
+                    'notes' => $request->notes,
+                    'read_at' => in_array($request->status, ['read', 'memorized']) ? now() : null,
+                    'memorized_at' => $request->status === 'memorized' ? now() : null
+                ]
+            );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Progress updated successfully',
-            'status' => $progress->status
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress updated successfully',
+                'status' => $progress->status
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Hadith progress update failed', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+                'hadith_id' => $hadith->id,
+            ]);
+            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
+        }
     }
 
     public function dashboard(): View

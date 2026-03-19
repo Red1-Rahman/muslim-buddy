@@ -90,12 +90,22 @@ class QuranController extends Controller
             ->with('surah')
             ->firstOrFail();
 
-        $progress = UserVerseProgress::firstOrCreate(
-            [
+        $progress = null;
+        try {
+            $progress = UserVerseProgress::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'verse_id' => $verse->id,
+                ]
+            );
+        } catch (\Throwable $e) {
+            \Log::error('Verse progress creation failed', [
+                'error' => $e->getMessage(),
                 'user_id' => $user->id,
                 'verse_id' => $verse->id,
-            ]
-        );
+            ]);
+            abort(500, 'Failed to load verse: ' . $e->getMessage());
+        }
 
         return view('quran.verse', compact('verse', 'progress', 'user'));
     }
@@ -108,22 +118,31 @@ class QuranController extends Controller
         $user = Auth::user();
         $verse = Verse::findOrFail($verseId);
 
-        $progress = UserVerseProgress::firstOrCreate(
-            [
+        try {
+            $progress = UserVerseProgress::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'verse_id' => $verse->id,
+                ]
+            );
+
+            if (!$progress->is_read) {
+                $progress->markAsRead();
+            }
+
+            return response()->json([
+                'success' => true,
+                'progress' => $progress,
+                'points' => $user->fresh()->total_points,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Mark verse as read failed', [
+                'error' => $e->getMessage(),
                 'user_id' => $user->id,
                 'verse_id' => $verse->id,
-            ]
-        );
-
-        if (!$progress->is_read) {
-            $progress->markAsRead();
+            ]);
+            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'progress' => $progress,
-            'points' => $user->fresh()->total_points,
-        ]);
     }
 
     /**
@@ -134,22 +153,31 @@ class QuranController extends Controller
         $user = Auth::user();
         $verse = Verse::findOrFail($verseId);
 
-        $progress = UserVerseProgress::firstOrCreate(
-            [
+        try {
+            $progress = UserVerseProgress::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'verse_id' => $verse->id,
+                ]
+            );
+
+            if (!$progress->is_understood) {
+                $progress->markAsUnderstood();
+            }
+
+            return response()->json([
+                'success' => true,
+                'progress' => $progress,
+                'points' => $user->fresh()->total_points,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Mark verse as understood failed', [
+                'error' => $e->getMessage(),
                 'user_id' => $user->id,
                 'verse_id' => $verse->id,
-            ]
-        );
-
-        if (!$progress->is_understood) {
-            $progress->markAsUnderstood();
+            ]);
+            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'progress' => $progress,
-            'points' => $user->fresh()->total_points,
-        ]);
     }
 
     /**
@@ -160,22 +188,31 @@ class QuranController extends Controller
         $user = Auth::user();
         $verse = Verse::findOrFail($verseId);
 
-        $progress = UserVerseProgress::firstOrCreate(
-            [
+        try {
+            $progress = UserVerseProgress::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'verse_id' => $verse->id,
+                ]
+            );
+
+            if (!$progress->is_memorized) {
+                $progress->markAsMemorized();
+            }
+
+            return response()->json([
+                'success' => true,
+                'progress' => $progress,
+                'points' => $user->fresh()->total_points,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Mark verse as memorized failed', [
+                'error' => $e->getMessage(),
                 'user_id' => $user->id,
                 'verse_id' => $verse->id,
-            ]
-        );
-
-        if (!$progress->is_memorized) {
-            $progress->markAsMemorized();
+            ]);
+            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'progress' => $progress,
-            'points' => $user->fresh()->total_points,
-        ]);
     }
 
     /**

@@ -31,19 +31,29 @@ class ProfileController extends Controller
 
         // Get today's goal
         $goalDate = now()->toDateString();
-        $todayGoal = DailyGoal::firstOrCreate(
-            [
+        
+        try {
+            $todayGoal = DailyGoal::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'goal_date' => $goalDate,
+                ],
+                [
+                    'target_verses' => 5,
+                    'verses_completed' => 0,
+                    'all_prayers_completed' => false,
+                ]
+            );
+            $todayGoal->updateVerseProgress();
+            $todayGoal->updatePrayerStatus();
+        } catch (\Throwable $e) {
+            \Log::error('Dashboard daily goal creation failed', [
+                'error' => $e->getMessage(),
                 'user_id' => $user->id,
                 'goal_date' => $goalDate,
-            ],
-            [
-                'target_verses' => 5,
-                'verses_completed' => 0,
-                'all_prayers_completed' => false,
-            ]
-        );
-        $todayGoal->updateVerseProgress();
-        $todayGoal->updatePrayerStatus();
+            ]);
+            abort(500, 'Failed to load daily goal: ' . $e->getMessage());
+        }
 
         // Get recent achievements
         $recentVerses = $user->verseProgress()
@@ -162,15 +172,24 @@ class ProfileController extends Controller
 
         $goalDate = now()->toDateString();
 
-        $goal = DailyGoal::updateOrCreate(
-            [
+        try {
+            $goal = DailyGoal::updateOrCreate(
+                [
+                    'user_id' => Auth::id(),
+                    'goal_date' => $goalDate,
+                ],
+                $validated
+            );
+
+            return redirect()->route('profile.show')->with('success', 'Daily goal updated!');
+        } catch (\Throwable $e) {
+            \Log::error('Daily goal update failed', [
+                'error' => $e->getMessage(),
                 'user_id' => Auth::id(),
                 'goal_date' => $goalDate,
-            ],
-            $validated
-        );
-
-        return redirect()->route('profile.show')->with('success', 'Daily goal updated!');
+            ]);
+            return redirect()->route('profile.show')->withErrors('Failed to update daily goal: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -183,17 +202,27 @@ class ProfileController extends Controller
         // Get today's stats
         $todayPrayers = $user->today_prayer_status;
         $goalDate = now()->toDateString();
-        $todayGoal = DailyGoal::firstOrCreate(
-            [
+        
+        try {
+            $todayGoal = DailyGoal::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'goal_date' => $goalDate,
+                ],
+                [
+                    'target_verses' => 5,
+                ]
+            );
+            $todayGoal->updateVerseProgress();
+            $todayGoal->updatePrayerStatus();
+        } catch (\Throwable $e) {
+            \Log::error('Dashboard daily goal update failed', [
+                'error' => $e->getMessage(),
                 'user_id' => $user->id,
                 'goal_date' => $goalDate,
-            ],
-            [
-                'target_verses' => 5,
-            ]
-        );
-        $todayGoal->updateVerseProgress();
-        $todayGoal->updatePrayerStatus();
+            ]);
+            abort(500, 'Failed to load dashboard: ' . $e->getMessage());
+        }
 
         // Get weekly progress
         $weeklyPrayers = $user->prayerLogs()
