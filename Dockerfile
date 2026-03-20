@@ -52,24 +52,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Patch the buggy Turso driver so it doesn't clear our libsql:// network URL
 RUN sed -i "s/\$config\['url'\] = \$this->checkPathOrFilename/\\/\/ \$config\['url'\] = \$this->checkPathOrFilename/" /var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLDatabase.php
 
-RUN php -r " \n\
-\$file = '/var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLPDOStatement.php'; \n\
-\$content = file_get_contents(\$file); \n\
-// Convert positional ? params to named :p0, :p1 etc before execute \n\
-\$old = 'return \$this->statement->execute(\$params);'; \n\
-\$new = '\$positional = array_values(\$params) === \$params && count(\$params) > 0 && !array_key_exists(0, array_flip(array_keys(\$params))); \n\
-if (\$positional || (count(\$params) > 0 && is_int(array_keys(\$params)[0]))) { \n\
-    \$i = 0; \n\
-    \$this->query = preg_replace_callback(\"/\\\?/\", function() use (&\$i) { return \":p\" . \$i++; }, \$this->query); \n\
-    \$named = []; \n\
-    foreach (array_values(\$params) as \$idx => \$val) { \$named[\":p\$idx\"] = \$val; } \n\
-    \$params = \$named; \n\
-} \n\
-return \$this->statement->execute(\$params);'; \n\
-\$content = str_replace(\$old, \$new, \$content); \n\
-file_put_contents(\$file, \$content); \n\
-echo 'Patched LibSQLPDOStatement positional params' . PHP_EOL; \n\
-"
+COPY docker/patch-libsql.php /tmp/patch-libsql.php
+RUN php /tmp/patch-libsql.php
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
