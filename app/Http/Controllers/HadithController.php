@@ -138,10 +138,13 @@ class HadithController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Hadith progress update failed', [
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => auth()->id(),
                 'hadith_id' => $hadith->id,
+                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => "[updateProgress] {$e->getMessage()} at {$e->getFile()}:{$e->getLine()}"], 500);
         }
     }
 

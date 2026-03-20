@@ -60,11 +60,14 @@ class PrayerController extends Controller
             } catch (\Throwable $e) {
                 \Log::error('PrayerLog firstOrCreate failed', [
                     'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
                     'user_id' => $user->id,
                     'prayer' => $prayer,
                     'prayer_date' => $prayerDate,
+                    'trace' => $e->getTraceAsString(),
                 ]);
-                abort(500, 'Database error loading prayer logs: ' . $e->getMessage());
+                abort(500, "[PrayerController::index] {$e->getMessage()} at {$e->getFile()}:{$e->getLine()} [Prayer: {$prayer}]");
             }
         }
 

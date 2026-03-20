@@ -101,10 +101,13 @@ class QuranController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Verse progress creation failed', [
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => $user->id,
                 'verse_id' => $verse->id,
+                'trace' => $e->getTraceAsString(),
             ]);
-            abort(500, 'Failed to load verse: ' . $e->getMessage());
+            abort(500, "[QuranController::verse] {$e->getMessage()} at {$e->getFile()}:{$e->getLine()} [Verse: {$verse->id}]");
         }
 
         return view('quran.verse', compact('verse', 'progress', 'user'));
@@ -138,10 +141,13 @@ class QuranController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Mark verse as read failed', [
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => $user->id,
                 'verse_id' => $verse->id,
+                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => "[markAsRead] {$e->getMessage()} at {$e->getFile()}:{$e->getLine()}"], 500);
         }
     }
 
@@ -173,10 +179,13 @@ class QuranController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Mark verse as understood failed', [
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => $user->id,
                 'verse_id' => $verse->id,
+                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => "[markAsUnderstood] {$e->getMessage()} at {$e->getFile()}:{$e->getLine()}"], 500);
         }
     }
 
@@ -208,10 +217,13 @@ class QuranController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Mark verse as memorized failed', [
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => $user->id,
                 'verse_id' => $verse->id,
+                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => "[markAsMemorized] {$e->getMessage()} at {$e->getFile()}:{$e->getLine()}"], 500);
         }
     }
 

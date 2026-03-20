@@ -49,10 +49,13 @@ class ProfileController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Dashboard daily goal creation failed', [
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => $user->id,
                 'goal_date' => $goalDate,
+                'trace' => $e->getTraceAsString(),
             ]);
-            abort(500, 'Failed to load daily goal: ' . $e->getMessage());
+            abort(500, "[ProfileController::show] Daily Goal Error - {$e->getMessage()} at {$e->getFile()}:{$e->getLine()}");
         }
 
         // Get recent achievements
@@ -185,10 +188,14 @@ class ProfileController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Daily goal update failed', [
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => Auth::id(),
                 'goal_date' => $goalDate,
+                'validated_data' => $validated,
+                'trace' => $e->getTraceAsString(),
             ]);
-            return redirect()->route('profile.show')->withErrors('Failed to update daily goal: ' . $e->getMessage());
+            return redirect()->route('profile.show')->withErrors("Daily Goal Update Error - {$e->getMessage()} at {$e->getFile()}:{$e->getLine()}");
         }
     }
 
@@ -218,10 +225,13 @@ class ProfileController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Dashboard daily goal update failed', [
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => $user->id,
                 'goal_date' => $goalDate,
+                'trace' => $e->getTraceAsString(),
             ]);
-            abort(500, 'Failed to load dashboard: ' . $e->getMessage());
+            abort(500, "[ProfileController::dashboard] Daily Goal Error - {$e->getMessage()} at {$e->getFile()}:{$e->getLine()}");
         }
 
         // Get weekly progress
