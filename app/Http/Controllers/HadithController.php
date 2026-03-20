@@ -176,8 +176,10 @@ class HadithController extends Controller
         $collectionStats = HadithCollection::withCount([
             'hadiths',
             'hadiths as read_hadiths_count' => function ($query) use ($userId) {
-                $query->join('user_hadith_progress', 'hadiths.id', '=', 'user_hadith_progress.hadith_id')
-                    ->where('user_hadith_progress.user_id', $userId)
+                $query->join('user_hadith_progress', function ($join) {
+                    $join->on('hadiths.id', '=', 'user_hadith_progress.hadith_id');
+                })
+                    ->where('user_hadith_progress.user_id', '=', $userId)
                     ->whereIn('user_hadith_progress.status', ['read', 'memorized']);
             }
         ])->get();

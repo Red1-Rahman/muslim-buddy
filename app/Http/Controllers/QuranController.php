@@ -337,8 +337,8 @@ class QuranController extends Controller
         $juzProgress = DB::table('verses')
             ->leftJoin('user_verse_progress', function ($join) use ($user) {
                 $join->on('verses.id', '=', 'user_verse_progress.verse_id')
-                    ->where('user_verse_progress.user_id', '=', $user->id)
-                    ->where('user_verse_progress.is_read', '=', true);
+                    ->on('user_verse_progress.user_id', '=', DB::raw($user->id))
+                    ->on('user_verse_progress.is_read', '=', DB::raw('1'));
             })
             ->select('verses.juz', DB::raw('COUNT(*) as total'), DB::raw('COUNT(user_verse_progress.id) as `read`'))
             ->whereNotNull('verses.juz')
