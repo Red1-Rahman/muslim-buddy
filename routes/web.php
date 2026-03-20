@@ -6,12 +6,30 @@ use App\Http\Controllers\QuranController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\ZakatController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+// Health check - diagnose database/app status
+Route::get('/health', function () {
+    try {
+        DB::connection()->getPdo();
+        return response()->json(['status' => 'ok', 'database' => 'connected'], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'database' => 'disconnected',
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+});
 
 Route::get('/', function () {
     return view('welcome');
