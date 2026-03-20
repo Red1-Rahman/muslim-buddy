@@ -156,11 +156,14 @@ class User extends Authenticatable
         $prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
         $status = [];
         
+        // Fetch all today's logs at once instead of looping
+        $todayLogs = $this->prayerLogs()
+            ->where('prayer_date', '=', $today)
+            ->get()
+            ->keyBy('prayer_name');
+        
         foreach ($prayers as $prayer) {
-            $log = $this->prayerLogs()
-                ->where('prayer_date', $today)
-                ->where('prayer_name', $prayer)
-                ->first();
+            $log = $todayLogs->get($prayer);
             
             $status[$prayer] = [
                 'completed' => $log ? $log->is_completed : false,

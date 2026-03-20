@@ -54,14 +54,17 @@ Route::get('/debug/test', function () {
 Route::middleware(['auth'])->get('/debug/dashboard-test', function () {
     try {
         $user = auth()->user();
-        $dailyGoal = $user ? $user->dailyGoal : null;
-        
-        return response()->json([
-            'status' => 'ok',
-            'user_id' => $user?->id,
-            'has_daily_goal' => $dailyGoal ? true : false,
-            'daily_goal' => $dailyGoal ? $dailyGoal->toArray() : null,
-        ], 200);
+        return response()->json(['status' => 'ok', 'step' => 1, 'user_id' => $user->id], 200);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'step' => 1, 'error' => $e->getMessage()], 500);
+    }
+});
+
+Route::middleware(['auth'])->get('/debug/prayer-status-test', function () {
+    try {
+        $user = auth()->user();
+        $status = $user->today_prayer_status;
+        return response()->json(['status' => 'ok', 'prayer_status' => $status], 200);
     } catch (\Exception $e) {
         return response()->json([
             'status' => 'error',
