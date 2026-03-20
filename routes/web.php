@@ -62,9 +62,42 @@ Route::middleware(['auth'])->get('/debug/dashboard-test', function () {
 
 Route::middleware(['auth'])->get('/debug/prayer-status-test', function () {
     try {
+        // Enable query logging
+        DB::enableQueryLog();
+        
         $user = auth()->user();
         $status = $user->today_prayer_status;
-        return response()->json(['status' => 'ok', 'prayer_status' => $status], 200);
+        
+        $queries = DB::getQueryLog();
+        return response()->json([
+            'status' => 'ok', 
+            'prayer_status' => $status,
+            'queries' => $queries,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+});
+
+Route::middleware(['auth'])->get('/debug/prayer-logs-test', function () {
+    try {
+        DB::enableQueryLog();
+        
+        $user = auth()->user();
+        $logs = $user->prayerLogs()->get();
+        
+        $queries = DB::getQueryLog();
+        return response()->json([
+            'status' => 'ok',
+            'logs_count' => count($logs),
+            'queries' => $queries,
+        ], 200);
     } catch (\Exception $e) {
         return response()->json([
             'status' => 'error',
