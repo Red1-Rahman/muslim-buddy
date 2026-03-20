@@ -31,6 +31,48 @@ Route::get('/health', function () {
     }
 });
 
+// Debug test - try to fetch a user like dashboard would
+Route::get('/debug/test', function () {
+    try {
+        $user = \App\Models\User::first();
+        return response()->json([
+            'status' => 'ok',
+            'user' => $user ? $user->toArray() : 'no users',
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+});
+
+// Debug test - try authenticated user query like dashboard does
+Route::middleware(['auth'])->get('/debug/dashboard-test', function () {
+    try {
+        $user = auth()->user();
+        $dailyGoal = $user ? $user->dailyGoal : null;
+        
+        return response()->json([
+            'status' => 'ok',
+            'user_id' => $user?->id,
+            'has_daily_goal' => $dailyGoal ? true : false,
+            'daily_goal' => $dailyGoal ? $dailyGoal->toArray() : null,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+});
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');

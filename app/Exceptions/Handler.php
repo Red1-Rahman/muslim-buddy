@@ -27,4 +27,23 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    /**
+     * Render the exception into an HTTP response.
+     */
+    public function render($request, Throwable $e)
+    {
+        // Return detailed error info for JSON requests or API calls
+        if ($request->expectsJson() || $request->is('api/*') || $request->is('debug/*')) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ], 500);
+        }
+
+        return parent::render($request, $e);
+    }
 }
