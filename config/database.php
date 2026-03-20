@@ -34,8 +34,8 @@ return [
 
         'libsql' => [
             'driver' => 'libsql',
-            'url' => env('TURSO_DB_URL', env('LIBSQL_URL', env('DATABASE_URL'))),
-            'authToken' => env('TURSO_DB_TOKEN', env('LIBSQL_AUTH_TOKEN', env('LIBSQL_TOKEN'))),
+            'url' => env('TURSO_DB_URL'),
+            'authToken' => env('TURSO_DB_TOKEN'),
             'syncUrl' => '',
             'syncInterval' => 5,
             'read_your_writes' => true,
