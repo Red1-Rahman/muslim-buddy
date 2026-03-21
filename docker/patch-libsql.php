@@ -67,24 +67,37 @@ if (file_exists($stmtFile)) {
     }
 }
 
-$connFile = '/var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLConnection.php';
-$content = file_get_contents($connFile);
+$connFile2 = '/var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLConnection.php';
+$content2 = file_get_contents($connFile2);
 
-$old = '$statement = $this->getRawPdo()->prepare($query);
+$old2 = '            $statement = $this->getRawPdo()->prepare($query);
+
             $results = $statement->query($bindings);';
 
-$new = '$statement = $this->getRawPdo()->prepare($query);
-            if (!empty($bindings) && !array_key_exists(0, $bindings)) {
+$new2 = '            if (!empty($bindings) && !(count(array_filter(array_keys($bindings), "is_string")) > 0)) {
+                $i = 0;
+                $count = count($bindings);
+                $query = preg_replace_callback("/\?/", function() use (&$i, $count) {
+                    return $i < $count ? ":p" . $i++ : "?";
+                }, $query);
+                $named = [];
+                foreach (array_values($bindings) as $idx => $val) {
+                    $named[":p$idx"] = $val;
+                }
+                $bindings = $named;
+            }
+            $statement = $this->getRawPdo()->prepare($query);
+            if (!empty($bindings)) {
                 $statement->bindNamed($bindings);
                 $results = $statement->query([]);
             } else {
                 $results = $statement->query($bindings);
             }';
 
-$patched = str_replace($old, $new, $content);
-if ($patched !== $content) {
-    file_put_contents($connFile, $patched);
-    echo "Patched LibSQLConnection select() bindNamed\n";
+$patched2 = str_replace($old2, $new2, $content2);
+if ($patched2 !== $content2) {
+    file_put_contents($connFile2, $patched2);
+    echo "Patched LibSQLConnection select() direct query\n";
 } else {
-    echo "LibSQLConnection select() - pattern not found\n";
+    echo "LibSQLConnection select() direct - pattern not found\n";
 }
