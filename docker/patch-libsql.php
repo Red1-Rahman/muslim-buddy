@@ -1,39 +1,68 @@
 <?php
-$dbFile = '/var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLDatabase.php';
-if (file_exists($dbFile)) {
-    $dbContent = file_get_contents($dbFile);
-    $oldDb = 'public function prepare(string $sql): LibSQLPDOStatement
-    {
-        return new LibSQLPDOStatement(';
-    $newDb = 'public function prepare(string $sql): LibSQLPDOStatement
-    {
-        $i = 0;
-        $sql = preg_replace_callback("/\?/", function() use (&$i) {
-            return ":p" . $i++;
-        }, $sql);
-        return new LibSQLPDOStatement(';
+$connFile = '/var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLConnection.php';
+if (file_exists($connFile)) {
+    $connContent = file_get_contents($connFile);
     
-    $dbContent = str_replace($oldDb, $newDb, $dbContent);
-    file_put_contents($dbFile, $dbContent);
-    echo "Patched LibSQLDatabase ->prepare()\n";
+    if (strpos($connContent, 'protected function run(') === false) {
+        $runMethod = '
+
+    protected function run($query, $bindings, \Closure $callback)
+    {
+        $hasNamed = false;
+        foreach ($bindings as $key => $val) {
+            if (is_string($key)) { $hasNamed = true; break; }
+        }
+        
+        if (!$hasNamed && !empty($bindings)) {
+            $i = 0;
+            $vals = array_values($bindings);
+            $count = count($vals);
+            
+            $query = preg_replace_callback("/\?/", function() use (&$i, $count) {
+                if ($i < $count) {
+                    return ":p" . $i++;
+                }
+                return "?";
+            }, $query);
+            
+            $named = [];
+            foreach ($vals as $idx => $val) {
+                $named[":p$idx"] = $val;
+            }
+            $bindings = $named;
+        }
+
+        return parent::run($query, $bindings, $callback);
+    }
+}';
+        $connContent = preg_replace('/\}\s*$/', $runMethod, $connContent);
+        file_put_contents($connFile, $connContent);
+        echo "Patched LibSQLConnection ->run()\n";
+    }
 }
 
 $stmtFile = '/var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLPDOStatement.php';
 if (file_exists($stmtFile)) {
-    $stmtContent = file_get_contents($stmtFile);
-    
-    $pattern = '/if \(\$this->hasNamedParameters\(\$parameters\)\) \{\s+\$this->statement->bindNamed\(\$parameters\);\s+\} else \{\s+\$this->statement->bindPositional\(array_values\(\$parameters\)\);\s+\}/';
-    
-    $replacement = 'if (!$this->hasNamedParameters($parameters)) {
-            $named = [];
+    $content = file_get_contents($stmtFile);
+    $old = 'if ($this->hasNamedParameters($parameters)) {
+            $this->statement->bindNamed($parameters);
+        } else {
+            $this->statement->bindPositional(array_values($parameters));
+        }';
+    $new = '$namedParams = [];
+        if ($this->hasNamedParameters($parameters)) {
+            $namedParams = $parameters;
+        } else {
             foreach (array_values($parameters) as $idx => $val) {
-                $named[":p$idx"] = $val;
+                $namedParams[":p$idx"] = $val;
             }
-            $parameters = $named;
         }
-        $this->statement->bindNamed($parameters);';
-        
-    $stmtContent = preg_replace($pattern, $replacement, $stmtContent);
-    file_put_contents($stmtFile, $stmtContent);
-    echo "Patched LibSQLPDOStatement positional params\n";
+        $this->statement->bindNamed($namedParams);';
+    $patched = str_replace($old, $new, $content);
+    if ($patched !== $content) {
+        file_put_contents($stmtFile, $patched);
+        echo "Patched LibSQLPDOStatement bindPositional\n";
+    } else {
+        echo "LibSQLPDOStatement - pattern not found, skipping\n";
+    }
 }
