@@ -66,3 +66,25 @@ if (file_exists($stmtFile)) {
         echo "LibSQLPDOStatement - pattern not found, skipping\n";
     }
 }
+
+$connFile = '/var/www/vendor/tursodatabase/turso-driver-laravel/src/Database/LibSQLConnection.php';
+$content = file_get_contents($connFile);
+
+$old = '$statement = $this->getRawPdo()->prepare($query);
+            $results = $statement->query($bindings);';
+
+$new = '$statement = $this->getRawPdo()->prepare($query);
+            if (!empty($bindings) && !array_key_exists(0, $bindings)) {
+                $statement->bindNamed($bindings);
+                $results = $statement->query([]);
+            } else {
+                $results = $statement->query($bindings);
+            }';
+
+$patched = str_replace($old, $new, $content);
+if ($patched !== $content) {
+    file_put_contents($connFile, $patched);
+    echo "Patched LibSQLConnection select() bindNamed\n";
+} else {
+    echo "LibSQLConnection select() - pattern not found\n";
+}
