@@ -87,12 +87,8 @@ $new2 = '            if (!empty($bindings) && !(count(array_filter(array_keys($b
                 $bindings = $named;
             }
             $statement = $this->getRawPdo()->prepare($query);
-            if (!empty($bindings)) {
-                $statement->bindNamed($bindings);
-                $results = $statement->query([]);
-            } else {
-                $results = $statement->query($bindings);
-            }';
+
+            $results = $statement->query($bindings);';
 
 $patched2 = str_replace($old2, $new2, $content2);
 if ($patched2 !== $content2) {
