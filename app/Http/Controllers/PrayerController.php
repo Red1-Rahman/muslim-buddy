@@ -278,7 +278,7 @@ class PrayerController extends Controller
             'current_streak' => $user->prayer_streak ?? 0,
             'this_month' => PrayerLog::where('user_id', $user->id)
                 ->whereRaw('"is_completed" = 1')
-                ->whereBetween('prayer_date', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])
+                ->whereRaw('"prayer_date" BETWEEN \'' . now()->startOfMonth()->toDateString() . '\' AND \'' . now()->endOfMonth()->toDateString() . '\'')
                 ->count(),
             'recent_prayers' => PrayerLog::where('user_id', $user->id)
                 ->whereRaw('"is_completed" = 1')
@@ -291,7 +291,7 @@ class PrayerController extends Controller
         // Get monthly prayer completion rate (PHP-side grouping to avoid LibSQL limitations)
         $monthlyData = PrayerLog::where('user_id', $user->id)
             ->whereRaw('"is_completed" = 1')
-            ->whereBetween('prayer_date', [now()->startOfYear()->toDateString(), now()->endOfYear()->toDateString()])
+            ->whereRaw('"prayer_date" BETWEEN \'' . now()->startOfYear()->toDateString() . '\' AND \'' . now()->endOfYear()->toDateString() . '\'')
             ->get()
             ->groupBy(function ($log) {
                 return date('n', strtotime($log->prayer_date));

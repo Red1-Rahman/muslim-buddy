@@ -236,7 +236,7 @@ class ProfileController extends Controller
 
         // Get weekly progress
         $weeklyPrayers = $user->prayerLogs()
-            ->whereBetween('prayer_date', [now()->startOfWeek(), now()->endOfWeek()])
+            ->whereRaw('"prayer_date" BETWEEN \'' . now()->startOfWeek()->toDateString() . '\' AND \'' . now()->endOfWeek()->toDateString() . '\'')
             ->whereRaw('"is_completed" = 1')
             ->count();
 
@@ -246,14 +246,14 @@ class ProfileController extends Controller
             ->count();
 
         $monthlyPrayers = $user->prayerLogs()
-            ->whereBetween('prayer_date', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])
+            ->whereRaw('"prayer_date" BETWEEN \'' . now()->startOfMonth()->toDateString() . '\' AND \'' . now()->endOfMonth()->toDateString() . '\'')
             ->whereRaw('"is_completed" = 1')
             ->count();
 
         $currentStreak = $user->prayer_streak ?? 0;
 
         $weeklyVerses = $user->verseProgress()
-            ->whereBetween('read_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->whereRaw('"read_at" BETWEEN \'' . now()->startOfWeek()->toDateTimeString() . '\' AND \'' . now()->endOfWeek()->toDateTimeString() . '\'')
             ->whereRaw('"is_read" = 1')
             ->count();
 

@@ -60,8 +60,7 @@ class DailyGoal extends Model
         $endDate = $this->goal_date . ' 23:59:59';
 
         $count = UserVerseProgress::where('user_id', $this->user_id)
-            ->where('read_at', '>=', $startDate)
-            ->where('read_at', '<=', $endDate)
+            ->whereRaw('"read_at" BETWEEN \'' . $startDate . '\' AND \'' . $endDate . '\'')
             ->whereRaw('"is_read" = 1')
             ->count();
 

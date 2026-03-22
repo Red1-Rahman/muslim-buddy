@@ -92,17 +92,17 @@ class LeaderboardController extends Controller
             'prayerLogs as prayers_completed' => function ($query) use ($timeframe, $monthStart, $monthEnd) {
                 $query->whereRaw('"is_completed" = 1');
                 if ($timeframe === 'month') {
-                    $query->whereBetween('prayer_date', [$monthStart, $monthEnd]);
+                    $query->whereRaw('"prayer_date" BETWEEN \'' . $monthStart . '\' AND \'' . $monthEnd . '\'');
                 } elseif ($timeframe === 'week') {
-                    $query->whereBetween('prayer_date', [now()->startOfWeek(), now()->endOfWeek()]);
+                    $query->whereRaw('"prayer_date" BETWEEN \'' . now()->startOfWeek()->toDateString() . '\' AND \'' . now()->endOfWeek()->toDateString() . '\'');
                 }
             },
             'prayerLogs as prayers_on_time' => function ($query) use ($timeframe, $monthStart, $monthEnd) {
                 $query->whereRaw('"is_completed" = 1')->whereRaw('"on_time" = 1');
                 if ($timeframe === 'month') {
-                    $query->whereBetween('prayer_date', [$monthStart, $monthEnd]);
+                    $query->whereRaw('"prayer_date" BETWEEN \'' . $monthStart . '\' AND \'' . $monthEnd . '\'');
                 } elseif ($timeframe === 'week') {
-                    $query->whereBetween('prayer_date', [now()->startOfWeek(), now()->endOfWeek()]);
+                    $query->whereRaw('"prayer_date" BETWEEN \'' . now()->startOfWeek()->toDateString() . '\' AND \'' . now()->endOfWeek()->toDateString() . '\'');
                 }
             }
         ]);
