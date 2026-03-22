@@ -241,7 +241,7 @@ class ProfileController extends Controller
             ->count();
 
         $todayCompletedPrayers = $user->prayerLogs()
-            ->where('prayer_date', now()->toDateString())
+            ->whereRaw('"prayer_date" = \'' . now()->toDateString() . '\'')
             ->whereRaw('"is_completed" = 1')
             ->count();
 

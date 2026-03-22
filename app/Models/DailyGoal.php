@@ -74,7 +74,7 @@ class DailyGoal extends Model
     public function updatePrayerStatus(): void
     {
         $completedPrayers = PrayerLog::where('user_id', $this->user_id)
-            ->where('prayer_date', $this->goal_date)
+            ->whereRaw('"prayer_date" = \'' . $this->goal_date . '\'')
             ->whereRaw('"is_completed" = 1')
             ->count();
 

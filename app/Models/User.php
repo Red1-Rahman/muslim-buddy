@@ -158,8 +158,8 @@ class User extends Authenticatable
         
         foreach ($prayers as $prayer) {
             $log = $this->prayerLogs()
-                ->where('prayer_date', $today)
-                ->where('prayer_name', $prayer)
+                ->whereRaw('"prayer_date" = \'' . $today . '\'')
+                ->whereRaw('"prayer_name" = \'' . $prayer . '\'')
                 ->first();
             
             $status[$prayer] = [
@@ -181,7 +181,7 @@ class User extends Authenticatable
         
         // Check if all 5 prayers are completed today
         $todayCompleted = $this->prayerLogs()
-            ->where('prayer_date', $today)
+            ->whereRaw('"prayer_date" = \'' . $today . '\'')
             ->whereRaw('"is_completed" = 1')
             ->count();
         
