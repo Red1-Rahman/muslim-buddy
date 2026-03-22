@@ -265,23 +265,23 @@ class PrayerController extends Controller
 
         $stats = [
             'total_prayers' => PrayerLog::where('user_id', $user->id)
-                ->where('is_completed', true)
+                ->whereRaw('"is_completed" = 1')
                 ->count(),
             'prayers_on_time' => PrayerLog::where('user_id', $user->id)
-                ->where('is_completed', true)
-                ->where('on_time', true)
+                ->whereRaw('"is_completed" = 1')
+                ->whereRaw('"on_time" = 1')
                 ->count(),
             'prayers_in_congregation' => PrayerLog::where('user_id', $user->id)
-                ->where('is_completed', true)
+                ->whereRaw('"is_completed" = 1')
                 ->where('in_congregation', true)
                 ->count(),
             'current_streak' => $user->prayer_streak ?? 0,
             'this_month' => PrayerLog::where('user_id', $user->id)
-                ->where('is_completed', true)
+                ->whereRaw('"is_completed" = 1')
                 ->whereBetween('prayer_date', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])
                 ->count(),
             'recent_prayers' => PrayerLog::where('user_id', $user->id)
-                ->where('is_completed', true)
+                ->whereRaw('"is_completed" = 1')
                 ->orderBy('prayer_date', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->limit(10)
@@ -290,7 +290,7 @@ class PrayerController extends Controller
 
         // Get monthly prayer completion rate (PHP-side grouping to avoid LibSQL limitations)
         $monthlyData = PrayerLog::where('user_id', $user->id)
-            ->where('is_completed', true)
+            ->whereRaw('"is_completed" = 1')
             ->whereBetween('prayer_date', [now()->startOfYear()->toDateString(), now()->endOfYear()->toDateString()])
             ->get()
             ->groupBy(function ($log) {

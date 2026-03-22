@@ -75,7 +75,7 @@ class DailyGoal extends Model
     {
         $completedPrayers = PrayerLog::where('user_id', $this->user_id)
             ->where('prayer_date', $this->goal_date)
-            ->where('is_completed', true)
+            ->whereRaw('"is_completed" = 1')
             ->count();
 
         $this->update(['all_prayers_completed' => $completedPrayers >= 5]);

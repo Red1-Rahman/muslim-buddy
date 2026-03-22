@@ -21,12 +21,12 @@ class ProfileController extends Controller
         $stats = [
             'quran_read_percentage' => $user->quran_progress_percentage,
             'quran_memorized_percentage' => $user->memorization_progress_percentage,
-            'total_prayers' => $user->prayerLogs()->where('is_completed', true)->count(),
+            'total_prayers' => $user->prayerLogs()->whereRaw('"is_completed" = 1')->count(),
             'prayer_streak' => $user->prayer_streak,
             'total_points' => $user->total_points,
             'verses_read' => $user->verseProgress()->whereRaw('"is_read" = 1')->count(),
             'verses_understood' => $user->verseProgress()->where('is_understood', true)->count(),
-            'verses_memorized' => $user->verseProgress()->where('is_memorized', true)->count(),
+            'verses_memorized' => $user->verseProgress()->whereRaw('"is_memorized" = 1')->count(),
         ];
 
         // Get today's goal
@@ -237,17 +237,17 @@ class ProfileController extends Controller
         // Get weekly progress
         $weeklyPrayers = $user->prayerLogs()
             ->whereBetween('prayer_date', [now()->startOfWeek(), now()->endOfWeek()])
-            ->where('is_completed', true)
+            ->whereRaw('"is_completed" = 1')
             ->count();
 
         $todayCompletedPrayers = $user->prayerLogs()
             ->where('prayer_date', now()->toDateString())
-            ->where('is_completed', true)
+            ->whereRaw('"is_completed" = 1')
             ->count();
 
         $monthlyPrayers = $user->prayerLogs()
             ->whereBetween('prayer_date', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])
-            ->where('is_completed', true)
+            ->whereRaw('"is_completed" = 1')
             ->count();
 
         $currentStreak = $user->prayer_streak ?? 0;
@@ -259,7 +259,7 @@ class ProfileController extends Controller
 
         // Get due reviews
         $dueReviews = $user->verseProgress()
-            ->where('is_memorized', true)
+            ->whereRaw('"is_memorized" = 1')
             ->where('next_review_at', '<=', now())
             ->count();
 

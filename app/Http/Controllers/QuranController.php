@@ -235,7 +235,7 @@ class QuranController extends Controller
         $user = Auth::user();
         $progress = UserVerseProgress::where('user_id', $user->id)
             ->where('verse_id', $verseId)
-            ->where('is_memorized', true)
+            ->whereRaw('"is_memorized" = 1')
             ->firstOrFail();
 
         $difficulty = $request->input('difficulty', 'easy');
@@ -256,7 +256,7 @@ class QuranController extends Controller
         
         try {
             $dueVerses = UserVerseProgress::where('user_id', $user->id)
-                ->where('is_memorized', true)
+                ->whereRaw('"is_memorized" = 1')
                 ->whereNotNull('next_review_at')
                 ->where('next_review_at', '<=', now())
                 ->with(['verse.surah'])
@@ -321,11 +321,11 @@ class QuranController extends Controller
                 ->where('is_understood', true)
                 ->count(),
             'total_memorized' => UserVerseProgress::where('user_id', $user->id)
-                ->where('is_memorized', true)
+                ->whereRaw('"is_memorized" = 1')
                 ->count(),
             'total_verses' => 6236,
             'due_reviews' => UserVerseProgress::where('user_id', $user->id)
-                ->where('is_memorized', true)
+                ->whereRaw('"is_memorized" = 1')
                 ->where('next_review_at', '<=', now())
                 ->count(),
         ];

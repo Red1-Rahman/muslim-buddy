@@ -143,7 +143,7 @@ class User extends Authenticatable
     public function getMemorizationProgressPercentageAttribute(): float
     {
         $totalVerses = 6236;
-        $memorizedCount = $this->verseProgress()->where('is_memorized', true)->count();
+        $memorizedCount = $this->verseProgress()->whereRaw('"is_memorized" = 1')->count();
         return round(($memorizedCount / $totalVerses) * 100, 2);
     }
 
@@ -182,7 +182,7 @@ class User extends Authenticatable
         // Check if all 5 prayers are completed today
         $todayCompleted = $this->prayerLogs()
             ->where('prayer_date', $today)
-            ->where('is_completed', true)
+            ->whereRaw('"is_completed" = 1')
             ->count();
         
         if ($todayCompleted >= 5) {

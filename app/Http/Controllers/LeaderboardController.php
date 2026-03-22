@@ -66,7 +66,7 @@ class LeaderboardController extends Controller
                 $query->whereRaw('"is_read" = 1');
             },
             'verseProgress as memorized_count' => function ($query) {
-                $query->where('is_memorized', true);
+                $query->whereRaw('"is_memorized" = 1');
             }
         ])
             ->orderBy('memorized_count', 'desc')
@@ -90,7 +90,7 @@ class LeaderboardController extends Controller
         
         $query = User::withCount([
             'prayerLogs as prayers_completed' => function ($query) use ($timeframe, $monthStart, $monthEnd) {
-                $query->where('is_completed', true);
+                $query->whereRaw('"is_completed" = 1');
                 if ($timeframe === 'month') {
                     $query->whereBetween('prayer_date', [$monthStart, $monthEnd]);
                 } elseif ($timeframe === 'week') {
@@ -98,7 +98,7 @@ class LeaderboardController extends Controller
                 }
             },
             'prayerLogs as prayers_on_time' => function ($query) use ($timeframe, $monthStart, $monthEnd) {
-                $query->where('is_completed', true)->where('on_time', true);
+                $query->whereRaw('"is_completed" = 1')->whereRaw('"on_time" = 1');
                 if ($timeframe === 'month') {
                     $query->whereBetween('prayer_date', [$monthStart, $monthEnd]);
                 } elseif ($timeframe === 'week') {
@@ -144,9 +144,9 @@ class LeaderboardController extends Controller
             'total_points' => $user->total_points,
             'prayer_streak' => $user->prayer_streak,
             'verses_read' => $user->verseProgress()->whereRaw('"is_read" = 1')->count(),
-            'verses_memorized' => $user->verseProgress()->where('is_memorized', true)->count(),
-            'prayers_completed' => $user->prayerLogs()->where('is_completed', true)->count(),
-            'prayers_on_time' => $user->prayerLogs()->where('is_completed', true)->where('on_time', true)->count(),
+            'verses_memorized' => $user->verseProgress()->whereRaw('"is_memorized" = 1')->count(),
+            'prayers_completed' => $user->prayerLogs()->whereRaw('"is_completed" = 1')->count(),
+            'prayers_on_time' => $user->prayerLogs()->whereRaw('"is_completed" = 1')->whereRaw('"on_time" = 1')->count(),
         ];
 
         return view('leaderboard.user-stats', compact('user', 'stats', 'currentUser'));
