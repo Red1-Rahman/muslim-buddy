@@ -62,7 +62,7 @@ class DailyGoal extends Model
         $count = UserVerseProgress::where('user_id', $this->user_id)
             ->where('read_at', '>=', $startDate)
             ->where('read_at', '<=', $endDate)
-            ->where('is_read', true)
+            ->whereRaw('"is_read" = 1')
             ->count();
 
         $this->update(['verses_completed' => $count]);

@@ -24,7 +24,7 @@ class ProfileController extends Controller
             'total_prayers' => $user->prayerLogs()->where('is_completed', true)->count(),
             'prayer_streak' => $user->prayer_streak,
             'total_points' => $user->total_points,
-            'verses_read' => $user->verseProgress()->where('is_read', true)->count(),
+            'verses_read' => $user->verseProgress()->whereRaw('"is_read" = 1')->count(),
             'verses_understood' => $user->verseProgress()->where('is_understood', true)->count(),
             'verses_memorized' => $user->verseProgress()->where('is_memorized', true)->count(),
         ];
@@ -60,7 +60,7 @@ class ProfileController extends Controller
 
         // Get recent achievements
         $recentVerses = $user->verseProgress()
-            ->where('is_read', true)
+            ->whereRaw('"is_read" = 1')
             ->orderBy('read_at', 'desc')
             ->limit(5)
             ->with('verse.surah')
@@ -254,7 +254,7 @@ class ProfileController extends Controller
 
         $weeklyVerses = $user->verseProgress()
             ->whereBetween('read_at', [now()->startOfWeek(), now()->endOfWeek()])
-            ->where('is_read', true)
+            ->whereRaw('"is_read" = 1')
             ->count();
 
         // Get due reviews

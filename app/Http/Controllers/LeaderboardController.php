@@ -63,7 +63,7 @@ class LeaderboardController extends Controller
     {
         return User::withCount([
             'verseProgress as read_count' => function ($query) {
-                $query->where('is_read', true);
+                $query->whereRaw('"is_read" = 1');
             },
             'verseProgress as memorized_count' => function ($query) {
                 $query->where('is_memorized', true);
@@ -143,7 +143,7 @@ class LeaderboardController extends Controller
         $stats = [
             'total_points' => $user->total_points,
             'prayer_streak' => $user->prayer_streak,
-            'verses_read' => $user->verseProgress()->where('is_read', true)->count(),
+            'verses_read' => $user->verseProgress()->whereRaw('"is_read" = 1')->count(),
             'verses_memorized' => $user->verseProgress()->where('is_memorized', true)->count(),
             'prayers_completed' => $user->prayerLogs()->where('is_completed', true)->count(),
             'prayers_on_time' => $user->prayerLogs()->where('is_completed', true)->where('on_time', true)->count(),

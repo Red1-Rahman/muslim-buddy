@@ -133,7 +133,7 @@ class User extends Authenticatable
     public function getQuranProgressPercentageAttribute(): float
     {
         $totalVerses = 6236; // Total verses in Quran
-        $readCount = $this->verseProgress()->where('is_read', true)->count();
+        $readCount = $this->verseProgress()->whereRaw('"is_read" = 1')->count();
         return round(($readCount / $totalVerses) * 100, 2);
     }
 

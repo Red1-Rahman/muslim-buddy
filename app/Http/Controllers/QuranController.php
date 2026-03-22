@@ -29,7 +29,7 @@ class QuranController extends Controller
                 ->whereHas('verse', function ($q) use ($surah) {
                     $q->where('surah_number', $surah->surah_number);
                 })
-                ->where('is_read', true)
+                ->whereRaw('"is_read" = 1')
                 ->count();
 
             $surah->progress = $totalVerses > 0 ? round(($readCount / $totalVerses) * 100, 1) : 0;
@@ -315,7 +315,7 @@ class QuranController extends Controller
 
         $stats = [
             'total_read' => UserVerseProgress::where('user_id', $user->id)
-                ->where('is_read', true)
+                ->whereRaw('"is_read" = 1')
                 ->count(),
             'total_understood' => UserVerseProgress::where('user_id', $user->id)
                 ->where('is_understood', true)
