@@ -27,7 +27,7 @@ if (file_exists($connFile)) {
             
             $named = [];
             foreach ($vals as $idx => $val) {
-                $named[":p$idx"] = $val;
+                $named["p$idx"] = $val;
             }
             $bindings = $named;
         }
@@ -54,7 +54,7 @@ if (file_exists($stmtFile)) {
             $namedParams = $parameters;
         } else {
             foreach (array_values($parameters) as $idx => $val) {
-                $namedParams[":p$idx"] = $val;
+                $namedParams["p$idx"] = $val;
             }
         }
         $this->statement->bindNamed($namedParams);';
@@ -82,7 +82,7 @@ $new2 = '            if (!empty($bindings) && !(count(array_filter(array_keys($b
                 }, $query);
                 $named = [];
                 foreach (array_values($bindings) as $idx => $val) {
-                    $named[":p$idx"] = $val;
+                    $named["p$idx"] = $val;
                 }
                 $bindings = $named;
             }
