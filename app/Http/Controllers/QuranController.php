@@ -318,7 +318,7 @@ class QuranController extends Controller
                 ->whereRaw('"is_read" = 1')
                 ->count(),
             'total_understood' => UserVerseProgress::where('user_id', $user->id)
-                ->where('is_understood', true)
+                ->whereRaw('"is_understood" = 1')
                 ->count(),
             'total_memorized' => UserVerseProgress::where('user_id', $user->id)
                 ->whereRaw('"is_memorized" = 1')

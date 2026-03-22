@@ -25,7 +25,7 @@ class ProfileController extends Controller
             'prayer_streak' => $user->prayer_streak,
             'total_points' => $user->total_points,
             'verses_read' => $user->verseProgress()->whereRaw('"is_read" = 1')->count(),
-            'verses_understood' => $user->verseProgress()->where('is_understood', true)->count(),
+            'verses_understood' => $user->verseProgress()->whereRaw('"is_understood" = 1')->count(),
             'verses_memorized' => $user->verseProgress()->whereRaw('"is_memorized" = 1')->count(),
         ];
 

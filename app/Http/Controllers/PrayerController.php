@@ -273,7 +273,7 @@ class PrayerController extends Controller
                 ->count(),
             'prayers_in_congregation' => PrayerLog::where('user_id', $user->id)
                 ->whereRaw('"is_completed" = 1')
-                ->where('in_congregation', true)
+                ->whereRaw('"in_congregation" = 1')
                 ->count(),
             'current_streak' => $user->prayer_streak ?? 0,
             'this_month' => PrayerLog::where('user_id', $user->id)
