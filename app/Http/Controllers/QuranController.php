@@ -258,7 +258,7 @@ class QuranController extends Controller
             $dueVerses = UserVerseProgress::where('user_id', $user->id)
                 ->whereRaw('"is_memorized" = 1')
                 ->whereNotNull('next_review_at')
-                ->where('next_review_at', '<=', now())
+                ->whereRaw('"next_review_at" <= \'' . now()->toDateTimeString() . '\'')
                 ->with(['verse.surah'])
                 ->orderBy('next_review_at')
                 ->get();
@@ -326,7 +326,7 @@ class QuranController extends Controller
             'total_verses' => 6236,
             'due_reviews' => UserVerseProgress::where('user_id', $user->id)
                 ->whereRaw('"is_memorized" = 1')
-                ->where('next_review_at', '<=', now())
+                ->whereRaw('"next_review_at" <= \'' . now()->toDateTimeString() . '\'')
                 ->count(),
         ];
 

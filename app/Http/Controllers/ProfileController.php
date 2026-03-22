@@ -260,7 +260,7 @@ class ProfileController extends Controller
         // Get due reviews
         $dueReviews = $user->verseProgress()
             ->whereRaw('"is_memorized" = 1')
-            ->where('next_review_at', '<=', now())
+            ->whereRaw('"next_review_at" <= \'' . now()->toDateTimeString() . '\'')
             ->count();
 
         return view('dashboard', compact(
