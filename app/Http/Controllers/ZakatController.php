@@ -29,6 +29,20 @@ class ZakatController extends Controller
             $nisabData = null;
         }
 
+        // Fallback when external nisab API is unavailable (Render network failures)
+        if ($nisabData === null) {
+            $nisabData = [
+                'meta' => ['timestamp' => 'Fallback data - gold/silver prices approximate'],
+                'nisab' => [
+                    'hanafi'  => ['gold' => ['grams' => 87.48,  'description' => '87.48g gold'], 'silver' => ['grams' => 612.36, 'description' => '612.36g silver']],
+                    'maliki'  => ['gold' => ['grams' => 85.0,   'description' => '85g gold'],   'silver' => ['grams' => 595.0,  'description' => '595g silver']],
+                    'shafii'  => ['gold' => ['grams' => 85.0,   'description' => '85g gold'],   'silver' => ['grams' => 595.0,  'description' => '595g silver']],
+                    'hanbali' => ['gold' => ['grams' => 85.0,   'description' => '85g gold'],   'silver' => ['grams' => 595.0,  'description' => '595g silver']],
+                ],
+                'prices' => ['gold' => ['per_gram' => 92.0], 'silver' => ['per_gram' => 0.92]],
+            ];
+        }
+
         try {
             $fxResponse = Http::timeout(8)
                 ->retry(2, 500)
