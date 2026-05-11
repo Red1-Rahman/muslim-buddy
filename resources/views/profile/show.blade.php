@@ -6,6 +6,18 @@
 <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50">
     <div class="container mx-auto px-6 py-8">
         <div class="max-w-4xl mx-auto">
+            @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            @if($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                {{ $errors->first() }}
+            </div>
+            @endif
+
             <!-- Header -->
             <div class="text-center mb-8">
                 <div class="w-24 h-24 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
@@ -22,6 +34,93 @@
                         <i class="fas fa-map-marker-alt mr-1"></i>{{ $user->location_name }}
                     </p>
                 @endif
+            </div>
+
+            <!-- Quran.Foundation Integration -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-emerald-100">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">
+                            <i class="fas fa-link text-emerald-600 mr-2"></i>Quran.Foundation Account
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1">OAuth2 + User Profile API integration for hackathon judging.</p>
+                    </div>
+                    @if($hasQfLink)
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                        Linked
+                    </span>
+                    @else
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                        Not Linked
+                    </span>
+                    @endif
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 text-sm mb-4">
+                    <div>
+                        <p class="text-gray-500">QF User ID</p>
+                        <p class="font-medium text-gray-800">{{ $user->qf_user_id ?: 'Not available yet' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">QF Email</p>
+                        <p class="font-medium text-gray-800">{{ $user->qf_email ?: 'Not available yet' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Last Profile Sync</p>
+                        <p class="font-medium text-gray-800">
+                            {{ $user->qf_profile_synced_at ? $user->qf_profile_synced_at->diffForHumans() : 'Never synced' }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Session Token</p>
+                        <p class="font-medium {{ $hasQfSessionToken ? 'text-emerald-700' : 'text-amber-700' }}">
+                            {{ $hasQfSessionToken ? 'Active in this session' : 'Not active in this session' }}
+                        </p>
+                    </div>
+                </div>
+
+                @if(is_array($qfProfile) && !empty($qfProfile))
+                <div class="bg-gray-50 rounded-lg p-4 mb-4 text-sm">
+                    <p class="font-medium text-gray-700 mb-2">Latest Quran.Foundation User Data</p>
+                    <div class="grid md:grid-cols-2 gap-3">
+                        <div>
+                            <p class="text-gray-500">Name</p>
+                            <p class="text-gray-800">
+                                {{ trim((string)($qfProfile['firstName'] ?? $qfProfile['first_name'] ?? '') . ' ' . (string)($qfProfile['lastName'] ?? $qfProfile['last_name'] ?? '')) ?: ($qfProfile['name'] ?? 'N/A') }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Email</p>
+                            <p class="text-gray-800">{{ $qfProfile['email'] ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                <div class="flex flex-wrap gap-3">
+                    <a href="{{ route('auth.qf.redirect') }}"
+                       class="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+                        <i class="fas fa-right-to-bracket mr-2"></i>{{ $hasQfLink ? 'Reconnect Quran.Foundation' : 'Connect Quran.Foundation' }}
+                    </a>
+
+                    @if($hasQfSessionToken)
+                    <form method="POST" action="{{ route('auth.qf.sync') }}">
+                        @csrf
+                        <button type="submit"
+                                class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-rotate mr-2"></i>Sync User Profile
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ route('auth.qf.disconnect') }}">
+                        @csrf
+                        <button type="submit"
+                                class="inline-flex items-center justify-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-unlink mr-2"></i>Disconnect Session
+                        </button>
+                    </form>
+                    @endif
+                </div>
             </div>
 
             <!-- Statistics Grid -->

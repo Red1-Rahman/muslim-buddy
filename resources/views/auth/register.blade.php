@@ -68,6 +68,13 @@
                 </div>
 
                 <div>
+                    <a href="{{ route('auth.qf.redirect') }}"
+                       class="group relative w-full flex justify-center py-2 px-4 border border-emerald-300 text-sm font-medium rounded-md text-emerald-700 bg-emerald-50 hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                        Continue with Quran.Foundation
+                    </a>
+                </div>
+
+                <div>
                     <a href="{{ route('auth.google.redirect') }}"
                        class="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         Continue with Google

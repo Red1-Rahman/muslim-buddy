@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Surah;
 use App\Models\Verse;
 use App\Models\UserVerseProgress;
+use App\Services\QuranFoundationContentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,11 @@ use Illuminate\Support\Facades\Http;
 
 class QuranController extends Controller
 {
+    public function __construct(
+        private readonly QuranFoundationContentService $quranFoundationContentService
+    ) {
+    }
+
     /**
      * Display list of surahs
      */
@@ -50,17 +56,30 @@ class QuranController extends Controller
             ->orderBy('verse_number')
             ->get();
         $audioUrl = null;
+        $audioSource = null;
 
         try {
             $recitationId = (int) config('services.quran.recitation_id', 7);
-            $apiBase = rtrim((string) config('services.quran.api_base', 'https://api.quran.com/api/v4'), '/');
 
-            $response = Http::timeout(5)
-                ->retry(2, 200)
-                ->get("{$apiBase}/chapter_recitations/{$recitationId}/{$surahNumber}");
+            // Prefer Quran.Foundation content API (authenticated), then fallback to public endpoint.
+            $audioUrl = $this->quranFoundationContentService->getChapterAudioUrl($recitationId, (int) $surahNumber);
+            if ($audioUrl) {
+                $audioSource = 'Quran.Foundation Content API';
+            }
 
-            if ($response->successful()) {
-                $audioUrl = data_get($response->json(), 'audio_file.audio_url');
+            if (!$audioUrl) {
+                $apiBase = rtrim((string) config('services.quran.api_base', 'https://api.quran.com/api/v4'), '/');
+
+                $response = Http::timeout(5)
+                    ->retry(2, 200)
+                    ->get("{$apiBase}/chapter_recitations/{$recitationId}/{$surahNumber}");
+
+                if ($response->successful()) {
+                    $audioUrl = data_get($response->json(), 'audio_file.audio_url');
+                    if ($audioUrl) {
+                        $audioSource = 'api.quran.com public endpoint';
+                    }
+                }
             }
         } catch (\Exception $e) {
             // non-fatal, audio player just won't show
@@ -76,7 +95,7 @@ class QuranController extends Controller
             $verse->user_progress = $progressMap->get($verse->id);
         }
 
-        return view('quran.show', compact('surah', 'verses', 'user', 'audioUrl'));
+        return view('quran.show', compact('surah', 'verses', 'user', 'audioUrl', 'audioSource'));
     }
 
     /**

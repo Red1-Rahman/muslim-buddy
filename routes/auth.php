@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
+use App\Http\Controllers\Auth\QuranFoundationAuthController;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -71,6 +72,12 @@ Route::get('/auth/google/redirect', function () {
         ->scopes(['openid', 'profile', 'email'])
         ->redirect();
 })->middleware('guest')->name('auth.google.redirect');
+
+Route::get('/auth/quran-foundation/redirect', [QuranFoundationAuthController::class, 'redirect'])
+    ->name('auth.qf.redirect');
+
+Route::get('/auth/quran-foundation/callback', [QuranFoundationAuthController::class, 'callback'])
+    ->name('auth.qf.callback');
 
 Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) {
     try {
@@ -151,6 +158,14 @@ Route::get('/auth/google/callback', function (Illuminate\Http\Request $request) 
         ]);
     }
 })->middleware('guest')->name('auth.google.callback');
+
+Route::post('/auth/quran-foundation/sync', [QuranFoundationAuthController::class, 'sync'])
+    ->middleware('auth')
+    ->name('auth.qf.sync');
+
+Route::post('/auth/quran-foundation/disconnect', [QuranFoundationAuthController::class, 'disconnect'])
+    ->middleware('auth')
+    ->name('auth.qf.disconnect');
 
 // Password Reset Routes
 Route::get('/forgot-password', function () {

@@ -27,8 +27,22 @@ services:
         value: https://muslim-buddy.onrender.com/auth/google/callback
       - key: QURAN_API_BASE_URL
         value: https://api.quran.com/api/v4
+      - key: QURAN_API_CLIENT_ID
+        sync: false
+      - key: QURAN_API_CLIENT_SECRET
+        sync: false
       - key: QURAN_RECITATION_ID
         value: 7
+      - key: QF_ENV
+        value: production
+      - key: QF_CLIENT_ID
+        sync: false
+      - key: QF_CLIENT_SECRET
+        sync: false
+      - key: QF_REDIRECT_URI
+        value: https://muslim-buddy.onrender.com/auth/quran-foundation/callback
+      - key: QF_USER_SCOPES
+        value: "openid offline_access user"
       - key: SESSION_DRIVER
         value: file
       - key: SESSION_SECURE_COOKIE

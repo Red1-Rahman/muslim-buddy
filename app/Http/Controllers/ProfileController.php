@@ -66,7 +66,20 @@ class ProfileController extends Controller
             ->with('verse.surah')
             ->get();
 
-        return view('profile.show', compact('user', 'stats', 'todayGoal', 'recentVerses'));
+        $qfProfile = session('qf_profile');
+        $qfTokens = session('qf_tokens');
+        $hasQfSessionToken = is_array($qfTokens) && !empty($qfTokens['access_token'] ?? null);
+        $hasQfLink = !empty($user->qf_user_id) || !empty($user->qf_email);
+
+        return view('profile.show', compact(
+            'user',
+            'stats',
+            'todayGoal',
+            'recentVerses',
+            'qfProfile',
+            'hasQfSessionToken',
+            'hasQfLink'
+        ));
     }
 
     /**

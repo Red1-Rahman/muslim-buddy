@@ -40,7 +40,12 @@
                 <audio controls preload="none" class="w-full">
                     <source src="{{ $audioUrl }}" type="audio/mpeg">
                 </audio>
-                <p class="text-sm text-gray-500 mt-1">Recitation: Mishari Rashid al-Afasy</p>
+                <p class="text-sm text-gray-500 mt-1">
+                    Recitation: Mishari Rashid al-Afasy
+                    @if(!empty($audioSource))
+                        | Source: {{ $audioSource }}
+                    @endif
+                </p>
             </div>
             @endif
 

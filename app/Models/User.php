@@ -21,6 +21,9 @@ class User extends Authenticatable
         'email',
         'email_verified_at',
         'google_id',
+        'qf_user_id',
+        'qf_email',
+        'qf_profile_synced_at',
         'password',
         'latitude',
         'longitude',
@@ -29,7 +32,6 @@ class User extends Authenticatable
         'madhab',
         'timezone',
         'bio',
-        'avatar',
         'avatar',
         'total_points',
         'prayer_streak',
@@ -63,6 +65,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'qf_profile_synced_at' => 'datetime',
         'password' => 'hashed',
         'last_prayer_date' => 'date',
         'latitude' => 'decimal:8',
