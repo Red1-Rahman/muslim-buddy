@@ -14,6 +14,11 @@ Muslim Buddy helps Muslims maintain consistency in their daily worship by combin
 
 ## Features
 
+### Log in / Sign up    
+
+<img width="1910" height="926" alt="image" src="https://github.com/user-attachments/assets/f03f5ce0-2312-459a-ae17-34c7ffc51e9a" />
+
+
 ### Prayer Tracking
 
 <img width="1920" height="1259" alt="Prayer page" src="https://github.com/user-attachments/assets/1c7350ca-11c8-4352-84b0-a19ad9171199" />
