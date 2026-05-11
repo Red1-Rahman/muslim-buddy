@@ -181,7 +181,10 @@ app/
 │                         # UserVerseProgress, Hadith
 └── Services/
     ├── Astronomy/        # Meeus solar calculations
-    └── Prayer/           # Prayer time calculation engine
+    ├── Prayer/           # Prayer time calculation engine
+    ├── QuranFoundationOAuthService.php
+    ├── QuranFoundationUserService.php
+    └── QuranFoundationContentService.php
 
 database/
 ├── migrations/
