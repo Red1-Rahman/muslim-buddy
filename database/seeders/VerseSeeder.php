@@ -127,24 +127,18 @@ class VerseSeeder extends Seeder
             }
 
             if (!empty($rows)) {
-                foreach (array_chunk($rows, 500) as $chunk) {
-                    Verse::upsert(
-                        $chunk,
-                        ['surah_number', 'verse_number'],
-                        [
-                            'arabic_text',
-                            'transliteration',
-                            'translation_english',
-                            'translation_bengali',
-                            'juz',
-                            'page',
-                            'revelation_type',
-                            'updated_at',
-                        ]
+                foreach ($rows as $row) {
+                    Verse::updateOrCreate(
+                        ['surah_number' => $row['surah_number'], 'verse_number' => $row['verse_number']],
+                        $row
                     );
                 }
 
                 $imported += count($rows);
+                
+                // Verify persistence
+                $actualCount = Verse::count();
+                $this->command?->info("Verses in DB after page {$page}: {$actualCount}");
             }
 
             $totalPages = (int) data_get($payload, 'pagination.total_pages', 1);
@@ -154,6 +148,13 @@ class VerseSeeder extends Seeder
         } while ($page <= $totalPages && ($maxPages <= 0 || $page <= $maxPages));
 
         $this->command?->info("Verse import complete. Total processed verses: {$imported}");
+        
+        $finalCount = Verse::count();
+        $this->command?->info("FINAL: {$finalCount} verses in database");
+        
+        if ($finalCount === 0) {
+            $this->command?->error('ERROR: No verses persisted to database!');
+        }
 
         $translationUpdated = $this->importEnglishTranslations(
             $baseUrl,
@@ -267,8 +268,10 @@ class VerseSeeder extends Seeder
                         continue;
                     }
 
-                    $affected = Verse::where('surah_number', $chapterId)
-                        ->where('verse_number', $verseNum)
+                    $affected = Verse::whereRaw('surah_number = ? AND verse_number = ?', [
+                            $chapterId,
+                            $verseNum,
+                        ])
                         ->update([
                             'transliteration' => $transliterationText,
                             'updated_at' => Carbon::now(),
@@ -408,8 +411,10 @@ class VerseSeeder extends Seeder
                 if (!empty($updates)) {
                     foreach ($updates as $update) {
                         $affected = Verse::query()
-                            ->where('surah_number', $update['surah_number'])
-                            ->where('verse_number', $update['verse_number'])
+                            ->whereRaw('surah_number = ? AND verse_number = ?', [
+                                $update['surah_number'],
+                                $update['verse_number'],
+                            ])
                             ->update([
                                 'translation_english' => $update['translation_english'],
                                 'updated_at' => $update['updated_at'],

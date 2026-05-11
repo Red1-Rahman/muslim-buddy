@@ -74,7 +74,7 @@ Muslim Buddy helps Muslims maintain consistency in their daily worship by combin
 | Framework | Laravel 10 |
 | Language | PHP 8.2+ |
 | Database | SQLite (local dev) / MySQL or PostgreSQL (production) |
-| Auth | Laravel built-in session auth |
+| Auth | Laravel session auth + Google OAuth + Quran.Foundation OAuth2/OIDC |
 | HTTP Client | Laravel HTTP (Guzzle) |
 | Frontend | Blade templates, Tailwind CSS |
 
