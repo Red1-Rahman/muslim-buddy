@@ -241,17 +241,88 @@ Tested deployment targets: Railway (recommended), Heroku, Render. Any platform s
 
 ---
 
-## Astronomical Calculation Method
+## Astronomical Calculation Method: Meeus Workflow
 
-Prayer times are derived from solar position using algorithms from *Astronomical Algorithms* by Jean Meeus:
+Prayer times are calculated from solar position using algorithms from *Astronomical Algorithms* by Jean Meeus. No external API is called at runtime.
 
-- Julian Day and Julian Century from calendar date
-- Solar longitude, mean anomaly, and equation of center
-- Apparent sidereal time and solar declination
-- Nutation in longitude and obliquity of the ecliptic
-- Hour angle → prayer time conversion per calculation method
+### Step 1 — Julian Day
 
-No external API is called at runtime for prayer times.
+Convert calendar date to Julian Day.
+
+$$\text{JD} = 367Y - \left\lfloor\frac{7(Y+\lfloor(M+9)/12\rfloor)}{4}\right\rfloor + \left\lfloor\frac{275M}{9}\right\rfloor + D + 1721013.5$$
+
+### Step 2 — Julian Centuries
+
+Meeus works heavily with:
+
+$$T = \frac{\text{JD} - 2451545.0}{36525}$$
+
+This measures time from the J2000 epoch.
+
+### Step 3 — Solar Mean Longitude
+
+$$L_0 = 280.46646 + 36000.76983T + 0.0003032T^2$$
+
+### Step 4 — Solar Mean Anomaly
+
+$$M = 357.52911 + 35999.05029T - 0.0001537T^2$$
+
+### Step 5 — Equation of Center
+
+$$C = (1.914602 - 0.004817T - 0.000014T^2)\sin M + (0.019993 - 0.000101T)\sin 2M + 0.000289\sin 3M$$
+
+### Step 6 — True Solar Longitude
+
+$$\lambda = L_0 + C$$
+
+### Step 7 — Obliquity of Ecliptic
+
+$$\epsilon = 23.439291 - 0.0130042T$$
+
+### Step 8 — Solar Declination
+
+Critical for prayer times.
+
+$$\delta = \arcsin(\sin\epsilon\sin\lambda)$$
+
+### Step 9 — Equation of Time
+
+Needed for solar noon. Meeus derives this from right ascension, mean longitude, and nutation corrections to produce the difference between apparent solar time and mean civil time.
+
+### Step 10 — Hour Angle
+
+For any prayer altitude:
+
+$$\cos H = \frac{\sin h - \sin\phi\sin\delta}{\cos\phi\cos\delta}$$
+
+Where:
+- $h$ = target solar altitude (in degrees)
+- $\phi$ = observer latitude
+- $\delta$ = solar declination
+
+### Prayer Altitudes
+
+| Prayer | Solar Altitude |
+|---|---|
+| Sunrise | −0.833° |
+| Maghrib | −0.833° |
+| Fajr | −18° (varies by method) |
+| Isha | −17° or −18° |
+| Asr | shadow geometry |
+
+### Hour Angle to Time
+
+Earth rotates 15° per hour. Convert hour angle to time offset:
+
+$$t = \frac{H}{15}$$
+
+Then:
+
+$$\text{event time} = \text{solar noon} \pm t$$
+
+### Convert UTC → Local Timezone
+
+Meeus astronomy produces physical event timing in UTC. Then convert to local timezone using IANA timezone database, DST rules, and civil timezone laws to produce human-readable prayer times.
 
 ---
 
