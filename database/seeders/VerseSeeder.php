@@ -16,7 +16,8 @@ class VerseSeeder extends Seeder
     public function run(): void
     {
         // Ensure no stale Laravel config cache affects these env reads
-        $baseUrl = rtrim(env('QURAN_API_BASE_URL', 'https://api.quran.com/api/v4'), '/');
+        $defaultBaseUrl = 'https://api.quran.com/api/v4';
+        $baseUrl = rtrim((string) env('QURAN_API_BASE_URL', $defaultBaseUrl), '/');
         $script = env('QURAN_API_SCRIPT', 'uthmani');
         $perPage = max(1, min((int) env('QURAN_API_PER_PAGE', 50), 50));
         $maxPages = (int) env('QURAN_API_MAX_PAGES', 0);
@@ -25,16 +26,20 @@ class VerseSeeder extends Seeder
         $fetchTransliteration = filter_var(env('QURAN_API_FETCH_TRANSLITERATION', true), FILTER_VALIDATE_BOOL);
 
         $clientId = env('QURAN_API_CLIENT_ID');
-        $authToken = env('QURAN_API_AUTH_TOKEN');
-
-        if (empty($authToken)) {
-            $authToken = env('QURAN_API_CLIENT_SECRET');
-        }
+        $authToken = (string) env('QURAN_API_AUTH_TOKEN', '');
+        $authTokenIsJwt = $authToken !== '' && substr_count($authToken, '.') >= 2;
 
         $publicHost = str_contains(strtolower($baseUrl), 'api.quran.com');
+
+        if (!$publicHost && !$authTokenIsJwt) {
+            $this->command?->warn('QURAN_API_BASE_URL requires a JWT. Falling back to api.quran.com for seeding.');
+            $baseUrl = $defaultBaseUrl;
+            $publicHost = true;
+        }
+
         $useAuthHeaders = !$publicHost
             && !empty($clientId)
-            && !empty($authToken);
+            && $authTokenIsJwt;
 
         $this->command?->info("Auth mode: " . ($useAuthHeaders ? 'authenticated' : 'public (no headers)'));
 
