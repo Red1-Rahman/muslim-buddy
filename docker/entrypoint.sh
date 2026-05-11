@@ -15,6 +15,18 @@ sed -i "s|^TURSO_DB_URL=.*|TURSO_DB_URL=${TURSO_DB_URL}|" /var/www/.env
 sed -i "s|^TURSO_DB_TOKEN=.*|TURSO_DB_TOKEN=${TURSO_DB_TOKEN}|" /var/www/.env
 sed -i "s|^DB_CONNECTION=.*|DB_CONNECTION=${DB_CONNECTION}|" /var/www/.env
 
+# Sync Quran API env vars into .env (only when set in environment)
+[ -n "$QURAN_API_BASE_URL" ] && sed -i "s|^QURAN_API_BASE_URL=.*|QURAN_API_BASE_URL=${QURAN_API_BASE_URL}|" /var/www/.env
+[ -n "$QURAN_INFO_API_BASE_URL" ] && sed -i "s|^QURAN_INFO_API_BASE_URL=.*|QURAN_INFO_API_BASE_URL=${QURAN_INFO_API_BASE_URL}|" /var/www/.env
+
+# Debug: base URLs only, no secrets
+echo "=== QURAN API ENV ==="
+echo "QURAN_API_BASE_URL (env)=$(printenv QURAN_API_BASE_URL || echo '(not set)')"
+grep '^QURAN_API_BASE_URL=' /var/www/.env || echo "QURAN_API_BASE_URL not in .env"
+grep '^QURAN_INFO_API_BASE_URL=' /var/www/.env || echo "QURAN_INFO_API_BASE_URL not in .env"
+echo "QURAN_API_AUTH_TOKEN length=$(printf '%s' "$QURAN_API_AUTH_TOKEN" | wc -c)"
+echo "===================="
+
 # Clear any cached config so fresh values are used
 php artisan config:clear
 
