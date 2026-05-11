@@ -13,7 +13,7 @@ class SurahInfoSeeder extends Seeder
      */
     public function run(): void
     {
-        $baseUrl = rtrim((string) env('QURAN_API_BASE_URL', 'https://api.quran.com/api/v4'), '/');
+        $baseUrl = rtrim((string) env('QURAN_INFO_API_BASE_URL', 'https://api.quran.com/api/v4'), '/');
 
         for ($surahNumber = 1; $surahNumber <= 114; $surahNumber++) {
             try {
